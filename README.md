@@ -66,7 +66,7 @@ var storedAsData: Int
 ```
 
 ## Why a Library?
-After all, there are lots of examples of similar utilities on the web. For example, [this post by John Sundell](https://www.swiftbysundell.com/articles/property-wrappers-in-swift/#a-propertys-properties) shows show a `@UserDefaultsBacked` property wrapper can be written in a handful of lines. 
+After all, there are lots of examples of similar utilities on the web. For example, [this post by John Sundell](https://www.swiftbysundell.com/articles/property-wrappers-in-swift/#a-propertys-properties) shows how a `@UserDefaultsBacked` property wrapper can be written in a handful of lines. 
 
 However, during development of [my app](https://github.com/AndrewBennet/ReadingList), I found that I really wanted to store _enum values_ in `UserDefaults`. For any enum which is backed by integer or a string, there was an obvious ideal implementation - store the enum's raw value. To provide a single API to persist both  `UserDefaults`-supported types as well as enum values _backed_ by `UserDefaults`-supported types proved a little tricky; adding the requirement that everything needed to also work on `Optional` wrappers of any supported type, and the problem became more complex still. Once solved for my app, I thought why not package up?
 
