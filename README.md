@@ -76,6 +76,12 @@ However, during development of [my app](https://github.com/AndrewBennet/ReadingL
 ### Swift Package Manager
 Add `https://github.com/AndrewBennet/PersistedPropertyWrapper.git` as a Swift Package Dependency in Xcode.
 
+### Cocoapods
+To install via CocoaPods, add the following line to your Podfile:
+```
+pod 'PersistedPropertyWrapper'
+```
+
 ### Manually
 Copy the contents of the `Sources` directory into your project.
 
