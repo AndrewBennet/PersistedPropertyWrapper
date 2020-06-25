@@ -11,7 +11,7 @@ Stick a `@Persisted` attribute on your variable.
 The first parameter of the argument is the string key under which the value will be stored in `UserDefaults`. If the type is non-Optional, you must also supply a `defaultValue`, which will be used when there is no value stored in `UserDefaults`.
 
 For example:
-```
+```swift
 @Persisted("UserSetting1", defaultValue: 42)
 var someUserSetting: Int
 
@@ -22,7 +22,7 @@ var someOtherUserSetting: Int?
 ### Storing Enums
 Want to store an enum value? If the enum has a backing type which is supported for storage in `UserDefaults` (e.g., `Int` or `String`), then those can also be marked as `@Persisted`, and the actual value stored in `UserDefaults` will be the enum's raw value. For example:
 
-```
+```swift
 enum AppTheme: Int {
     case brightRed
     case vibrantOrange
@@ -38,7 +38,7 @@ struct ThemeSettings {
 ### Storing Codable types
 Any codable type can be Persisted too:
 
-```
+```swift
 struct AppSettings: Codable {
     var welcomeMessage = "Hello world!"
     var isSpecialModeEnabled = false
@@ -57,7 +57,7 @@ func appDidLaunch() {
 Note the different initializer argument: `encodedDataKey` rather than a parameterless argument. This is required since plain `UserDefaults` types (and `RawRepresentable` types) can be `Codable` too. To remove ambiguity about which storage method is used, `@Persisted` needs an initializer overload.
 
 For example, the following two variables are stored via different mechanisms:
-```
+```swift
 @Persisted("storedAsInteger", defaultValue: 10)
 var storedAsInteger: Int
 
