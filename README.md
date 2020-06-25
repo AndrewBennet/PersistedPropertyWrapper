@@ -73,5 +73,5 @@ However, during development of [my app](https://github.com/AndrewBennet/ReadingL
 
 ## Alternatives
 
-- [SwiftyUserDefaults](https://github.com/sunshinejr/SwiftyUserDefaults) has more functionality, but you are required to define you stored properties in a specific extension.
-- [AppStorage](https://developer.apple.com/documentation/swiftui/appstorage): native Apple property wrapper, but tailored to SwiftUI, and only available in iOS 14
+- [SwiftyUserDefaults](https://github.com/sunshinejr/SwiftyUserDefaults) has more functionality, but you are required to define your stored properties in a specific extension.
+- [AppStorage](https://developer.apple.com/documentation/swiftui/appstorage): native Apple property wrapper, but tailored to (and defined in) SwiftUI, and only available in iOS 14
