@@ -69,18 +69,6 @@ final class PrimitivePropertyWrapperTests: XCTestCase {
         container.optional = nil
         XCTAssertNil(container.optional)
     }
-
-    static var allTests = [
-        ("testIntegerStorage", testIntegerStorage),
-        ("testInt16Storage", testInt16Storage),
-        ("testInt32Storage", testInt32Storage),
-        ("testInt64Storage", testInt64Storage),
-        ("testStringStorage", testStringStorage),
-        ("testBoolStorage", testBoolStorage),
-        ("testDataStorage", testDataStorage),
-        ("testFloatStorage", testFloatStorage),
-        ("testDoubleStorage", testDoubleStorage)
-    ]
 }
 
 struct PersistedPrimitivePropertyContainer<T> where T: UserDefaultsPrimitive {

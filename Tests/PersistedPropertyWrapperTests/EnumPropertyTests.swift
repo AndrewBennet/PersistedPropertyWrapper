@@ -42,11 +42,6 @@ final class EnumPropertyWrapperTests: XCTestCase {
         container.optional = nil
         XCTAssertNil(container.optional)
     }
-
-    static var allTests = [
-        ("testEnumIntStorage", testEnumIntStorage),
-        ("testEnumStringStorage", testEnumStringStorage)
-    ]
 }
 
 struct PersistedEnumPropertyContainer<T> where T: RawRepresentable, T: CaseIterable, T.RawValue: UserDefaultsPrimitive {

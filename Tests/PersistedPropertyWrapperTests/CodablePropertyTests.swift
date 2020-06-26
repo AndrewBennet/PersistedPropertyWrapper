@@ -35,7 +35,7 @@ final class CodablePropertyWrapperTests: XCTestCase {
 
     func testCodableInteger() {
         // This functionality relies on JSONEncoder being able to encode single values, which it can't do on iOS 12 or lower.
-        if #available(iOS 13.0, *) {
+        if #available(iOS 13.0, tvOS 13.0, *) {
             let defaultValue = CodableIntegerContainer.defaultValue
             XCTAssertEqual(defaultValue, CodableIntegerContainer.withDefault)
             XCTAssertNil(CodableIntegerContainer.optional)
@@ -50,10 +50,6 @@ final class CodablePropertyWrapperTests: XCTestCase {
             XCTAssertNil(CodableIntegerContainer.optional)
         }
     }
-
-    static var allTests = [
-        ("testCodableStorage", testCodableStorage)
-    ]
 }
 
 struct ExampleStuct: Codable, Equatable {
