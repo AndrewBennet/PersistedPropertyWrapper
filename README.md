@@ -4,7 +4,7 @@
 ![Cocoapods platforms](https://img.shields.io/cocoapods/p/PersistedPropertyWrapper)
 ![GitHub](https://img.shields.io/github/license/AndrewBennet/PersistedPropertyWrapper)
 
-**Persisted Property Wrapper** is a Swift library to enable extremely easy persistance of variables in the [`UserDefaults`](https://developer.apple.com/documentation/foundation/userdefaults) database on iOS.
+**Persisted Property Wrapper** is a Swift library to enable extremely easy persistance of variables in the [`UserDefaults`](https://developer.apple.com/documentation/foundation/userdefaults) database on Apple platforms.
 
 To use **Persisted Property Wrapper** you simply annotate a variable as being `@Persisted`. It supports the standard `UserDefaults` types, along with `RawRepresentable` types - where the `RawValue` is storable in `UserDefaults` - and `Codable` types. Plus of course any `Optional` type wrapping any of these types. The type-validity is checked at compile-time: attempting to use on any variables of a non-supported type will cause a compile-time error. 
 
