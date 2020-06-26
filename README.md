@@ -1,5 +1,8 @@
 # Persisted Property Wrapper
 ![Swift](https://github.com/AndrewBennet/PersistedPropertyWrapper/workflows/Swift/badge.svg)
+![Swift Version](https://img.shields.io/badge/Swift-5.2-F16D39.svg?style=flat)
+![Cocoapods platforms](https://img.shields.io/cocoapods/p/PersistedPropertyWrapper)
+![GitHub](https://img.shields.io/github/license/AndrewBennet/PersistedPropertyWrapper)
 
 **Persisted Property Wrapper** is a Swift library to enable extremely easy persistance of variables in the [`UserDefaults`](https://developer.apple.com/documentation/foundation/userdefaults) database on iOS.
 
@@ -76,10 +79,10 @@ However, during development of [my app](https://github.com/AndrewBennet/ReadingL
 ### Swift Package Manager
 Add `https://github.com/AndrewBennet/PersistedPropertyWrapper.git` as a Swift Package Dependency in Xcode.
 
-### Cocoapods
+### CocoaPods
 To install via CocoaPods, add the following line to your Podfile:
 ```
-pod 'PersistedPropertyWrapper'
+pod 'PersistedPropertyWrapper', '~> 1.0'
 ```
 
 ### Manually
