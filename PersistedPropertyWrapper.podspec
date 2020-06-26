@@ -1,6 +1,6 @@
 Pod::Spec.new do |spec|
   spec.name         = "PersistedPropertyWrapper"
-  spec.version      = "1.0.0"
+  spec.version      = "1.1.0"
   spec.summary      = "A Swift Property Wrapper to enable easy persistence in UserDefaults"
   spec.description  = <<-DESC
 	Persisted Property Wrapper is a Swift library to enable extremely easy persistance of variables in the UserDefaults database on iOS.
@@ -11,7 +11,10 @@ Pod::Spec.new do |spec|
   spec.homepage     = "https://github.com/AndrewBennet/PersistedPropertyWrapper"
   spec.license      = { :type => "MIT", :file => "LICENSE" }
   spec.author             = { "Andrew Bennet" => "me@andrewbennet.com" }
-  spec.platform     = :ios, 10.0
+  spec.osx.deployment_target = "10.13"
+  spec.ios.deployment_target = "10.0"
+  spec.watchos.deployment_target = "2.0"
+  spec.tvos.deployment_target = "10.0"
   spec.source       = { :git => "https://github.com/AndrewBennet/PersistedPropertyWrapper.git", :tag => "v#{spec.version}" }
   spec.source_files  = "Sources/PersistedPropertyWrapper/*.swift"
   spec.swift_versions = "5.2"
