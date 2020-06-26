@@ -11,4 +11,6 @@ extension String: UserDefaultsPrimitive {}
 extension Bool: UserDefaultsPrimitive {}
 extension Double: UserDefaultsPrimitive {}
 extension Float: UserDefaultsPrimitive {}
+extension Date: UserDefaultsPrimitive {}
 extension Data: UserDefaultsPrimitive {}
+extension Array: UserDefaultsPrimitive where Element: UserDefaultsPrimitive {}

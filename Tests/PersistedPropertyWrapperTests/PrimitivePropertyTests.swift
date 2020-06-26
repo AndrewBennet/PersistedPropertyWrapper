@@ -52,6 +52,26 @@ final class PrimitivePropertyWrapperTests: XCTestCase {
         runPrimitiveStorageTest(Double.self) { $0.round(.down) }
     }
 
+    func testDateStorage() {
+        runPrimitiveStorageTest(Date.self) { $0.addTimeInterval(100000) }
+    }
+
+    func testIntArrayStorage() {
+        runPrimitiveStorageTest([Int].self) { $0.append(123) }
+    }
+
+    func testStringArrayStorage() {
+        runPrimitiveStorageTest([String].self) { $0.append("!!!") }
+    }
+    
+    func testDateArrayStorage() {
+        runPrimitiveStorageTest([Date].self) { $0.removeAll() }
+    }
+    
+    func testDataArrayStorage() {
+        runPrimitiveStorageTest([Data].self) { $0[0].append("!".data(using: .utf8)!) }
+    }
+
     private func runPrimitiveStorageTest<T>(_ type: T.Type, operation: (inout T) -> Void) where T: UserDefaultsPrimitive, T: Equatable {
         var container = PersistedPrimitivePropertyContainer<T>()
         let defaultValue = PersistedPrimitivePropertyContainer<T>.defaultValue
@@ -73,10 +93,10 @@ final class PrimitivePropertyWrapperTests: XCTestCase {
 
 struct PersistedPrimitivePropertyContainer<T> where T: UserDefaultsPrimitive {
     static var defaultValue: T {
-        untypedtDefaultValue as! T
+        _defaultValue as! T
     }
 
-    private static var untypedtDefaultValue: UserDefaultsPrimitive {
+    private static var _defaultValue: UserDefaultsPrimitive {
         if T.self == Int.self {
             return 42
         } else if T.self == Int16.self {
@@ -95,6 +115,16 @@ struct PersistedPrimitivePropertyContainer<T> where T: UserDefaultsPrimitive {
             return 99.9 as Float
         } else if T.self == Double.self {
             return 101.1 as Double
+        } else if T.self == Date.self {
+            return Date(timeIntervalSince1970: 1593197020)
+        } else if T.self == [String].self {
+            return ["Hello", "World"]
+        } else if T.self == [Int].self {
+            return [1, 2, 3]
+        } else if T.self == [Date].self {
+            return [Date(timeIntervalSince1970: 1593197020)]
+        } else if T.self == [Data].self {
+            return ["Hello".data(using: .utf8)!, "World".data(using: .utf8)!]
         } else {
             preconditionFailure()
         }
