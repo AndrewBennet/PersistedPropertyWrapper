@@ -74,6 +74,18 @@ var storedAsData: Int
 
 **Note:** on iOS 12, using the `encodedDataKey` initializer with a value which would encode to a JSON _fragment_ (e.g. `Int`, `String`, `Bool`, etc) will cause a crash. This is due to a [bug in the Swift runtime](https://bugs.swift.org/browse/SR-6163) shipped prior to iOS 13. Using `encodedDataKey` has no benefit in these cases anyway.
 
+### Alternative Storage
+By default, a `@Persisted` property is stored in the `UserDefaults.standard` database; to store values in a different location, pass the `storage: ` parameter to the property wrapper:
+
+```
+extension UserDefaults {
+    static var aternative = UserDefaults(suiteName: "alternative")!
+}
+
+@Persisted("alternativeStoredValue", storage: .alternative)
+var alternativeStoredValue: Int?
+```
+
 ## Why a Library?
 After all, there are lots of examples of similar utilities on the web. For example, [this post by John Sundell](https://www.swiftbysundell.com/articles/property-wrappers-in-swift/#a-propertys-properties) shows how a `@UserDefaultsBacked` property wrapper can be written in a handful of lines. 
 
