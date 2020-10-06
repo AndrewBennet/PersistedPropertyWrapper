@@ -104,7 +104,7 @@ Add `https://github.com/AndrewBennet/PersistedPropertyWrapper.git` as a Swift Pa
 ### CocoaPods
 To install via CocoaPods, add the following line to your Podfile:
 ```
-pod 'PersistedPropertyWrapper', '~> 1.0'
+pod 'PersistedPropertyWrapper', '~> 2.0'
 ```
 
 ### Manually

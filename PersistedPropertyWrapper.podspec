@@ -1,6 +1,6 @@
 Pod::Spec.new do |spec|
   spec.name         = "PersistedPropertyWrapper"
-  spec.version      = "1.2.0"
+  spec.version      = "2.0.0"
   spec.summary      = "A Swift Property Wrapper to enable easy persistence in UserDefaults"
   spec.description  = <<-DESC
 	Persisted Property Wrapper is a Swift library to enable extremely easy persistance of variables in the UserDefaults database on iOS.
