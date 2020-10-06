@@ -60,7 +60,7 @@ import Foundation
 
 // MARK: Initialisers
 
-extension Persisted {
+public extension Persisted {
     init(_ key: String, defaultValue: Exposed, storage: UserDefaults = .standard) where Convertor == IdentityStorageConvertor<NonOptionalExposed>, Exposed == NonOptionalExposed {
         self.init(key: key, defaultValue: defaultValue, valueConvertor: .init(), storage: storage)
     }
