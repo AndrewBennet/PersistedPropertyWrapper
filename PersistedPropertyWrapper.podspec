@@ -17,5 +17,5 @@ Pod::Spec.new do |spec|
   spec.tvos.deployment_target = "10.0"
   spec.source       = { :git => "https://github.com/AndrewBennet/PersistedPropertyWrapper.git", :tag => "v#{spec.version}" }
   spec.source_files  = "Sources/PersistedPropertyWrapper/*.swift"
-  spec.swift_versions = "5.2"
+  spec.swift_versions = "5.3"
 end
