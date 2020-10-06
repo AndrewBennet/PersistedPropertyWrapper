@@ -60,41 +60,30 @@ import Foundation
 
 // MARK: Initialisers
 
-public extension Persisted where Convertor == IdentityStorageConvertor<NonOptionalExposed>, Exposed == NonOptionalExposed {
-    init(_ key: String, defaultValue: Exposed, storage: UserDefaults = .standard) {
+extension Persisted {
+    init(_ key: String, defaultValue: Exposed, storage: UserDefaults = .standard) where Convertor == IdentityStorageConvertor<NonOptionalExposed>, Exposed == NonOptionalExposed {
         self.init(key: key, defaultValue: defaultValue, valueConvertor: .init(), storage: storage)
     }
-}
-
-public extension Persisted where Convertor == IdentityStorageConvertor<NonOptionalExposed>, Exposed == NonOptionalExposed? {
-    init(_ key: String, storage: UserDefaults = .standard) {
+    
+    init(_ key: String, storage: UserDefaults = .standard) where Convertor == IdentityStorageConvertor<NonOptionalExposed>, Exposed == NonOptionalExposed? {
         self.init(key: key, defaultValue: nil, valueConvertor: .init(), storage: storage)
     }
-}
-
-public extension Persisted where Convertor == RawRepresentableStorageConvertor<NonOptionalExposed>, NonOptionalExposed: RawRepresentable, Exposed == NonOptionalExposed {
-    init(_ key: String, defaultValue: Exposed, storage: UserDefaults = .standard) {
+    
+    init(_ key: String, defaultValue: Exposed, storage: UserDefaults = .standard)  where Convertor == RawRepresentableStorageConvertor<NonOptionalExposed>, NonOptionalExposed: RawRepresentable, Exposed == NonOptionalExposed {
         self.init(key: key, defaultValue: defaultValue, valueConvertor: RawRepresentableStorageConvertor(), storage: storage)
     }
-}
-
-public extension Persisted where Convertor == RawRepresentableStorageConvertor<NonOptionalExposed>, NonOptionalExposed: RawRepresentable, Exposed == NonOptionalExposed? {
-    init(_ key: String, storage: UserDefaults = .standard) {
+    
+    init(_ key: String, storage: UserDefaults = .standard) where Convertor == RawRepresentableStorageConvertor<NonOptionalExposed>, NonOptionalExposed: RawRepresentable, Exposed == NonOptionalExposed? {
         self.init(key: key, defaultValue: nil, valueConvertor: RawRepresentableStorageConvertor(), storage: storage)
     }
-}
-
-// Note the different parameter name in the following: encodedDataKey vs unnamed. This is reqired since some Codable types
-// are also UserDefaultsPrimitive or RawRepresentable. We need a different key to be able to avoid ambiguity.
-
-public extension Persisted where Convertor == CodableStorageConvertor<NonOptionalExposed>, Exposed == NonOptionalExposed {
-    init(encodedDataKey key: String, defaultValue: Exposed, storage: UserDefaults = .standard) {
+    
+    // Note the different parameter name in the following: encodedDataKey vs unnamed. This is reqired since some Codable types
+    // are also UserDefaultsPrimitive or RawRepresentable. We need a different key to be able to avoid ambiguity.
+    init(encodedDataKey key: String, defaultValue: Exposed, storage: UserDefaults = .standard) where Convertor == CodableStorageConvertor<NonOptionalExposed>, Exposed == NonOptionalExposed {
         self.init(key: key, defaultValue: defaultValue, valueConvertor: CodableStorageConvertor(), storage: storage)
     }
-}
-
-public extension Persisted where Convertor == CodableStorageConvertor<NonOptionalExposed>, Exposed == NonOptionalExposed? {
-    init(encodedDataKey key: String, storage: UserDefaults = .standard) {
+    
+    init(encodedDataKey key: String, storage: UserDefaults = .standard) where Convertor == CodableStorageConvertor<NonOptionalExposed>, Exposed == NonOptionalExposed? {
         self.init(key: key, defaultValue: nil, valueConvertor: CodableStorageConvertor(), storage: storage)
     }
 }
