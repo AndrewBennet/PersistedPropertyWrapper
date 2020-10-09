@@ -79,7 +79,7 @@ By default, a `@Persisted` property is stored in the `UserDefaults.standard` dat
 
 ```
 extension UserDefaults {
-    static var aternative = UserDefaults(suiteName: "alternative")!
+    static var alternative = UserDefaults(suiteName: "alternative")!
 }
 
 @Persisted("alternativeStoredValue", storage: .alternative)
