@@ -74,6 +74,20 @@ var storedAsData: Int
 
 **Note:** on iOS 12, using the `encodedDataKey` initializer with a value which would encode to a JSON _fragment_ (e.g. `Int`, `String`, `Bool`, etc) will cause a crash. This is due to a [bug in the Swift runtime](https://bugs.swift.org/browse/SR-6163) shipped prior to iOS 13. Using `encodedDataKey` has no benefit in these cases anyway.
 
+### Storing types which implement `NSCoding`
+Any `NSObject` which conforms to `NSSecureCoding` can be Persisted too; this will store in UserDefaults the encoded representation of the object obtained from `NSKeyedArchiver`. For example:
+
+```swift
+class CloudKitSyncManager {
+    @Persisted(archivedDataKey: "ckServerChangeToken")
+    static var changeToken: CKServerChangeToken?
+}
+```
+
+Note that the argument label `archivedDataKey` must be used. As above, this is required to remove ambiguity about which storage method is used.
+
+**Note:** this storage mechanism is only supported on iOS 11 and up.
+
 ### Alternative Storage
 By default, a `@Persisted` property is stored in the `UserDefaults.standard` database; to store values in a different location, pass the `storage: ` parameter to the property wrapper:
 

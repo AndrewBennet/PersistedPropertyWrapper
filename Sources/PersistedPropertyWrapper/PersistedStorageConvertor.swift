@@ -44,3 +44,15 @@ public struct CodableStorageConvertor<Exposed>: PersistedStorageConvertor where 
         return try! jsonEncoder.encode(exposedValue)
     }
 }
+
+/// Maps between any `NSSecureCoding` conformant `NSObject` instance and `Data`
+@available(iOS 11.0, *)
+public struct ArchivedDataStorageConvertor<Exposed>: PersistedStorageConvertor where Exposed: NSObject, Exposed: NSSecureCoding {
+    public func convertToExposedType(_ persistedValue: Data) -> Exposed {
+        return try! NSKeyedUnarchiver.unarchivedObject(ofClass: Exposed.self, from: persistedValue)!
+    }
+
+    public func convertToPersistentStorage(_ exposedValue: Exposed) -> Data {
+        return try! NSKeyedArchiver.archivedData(withRootObject: exposedValue, requiringSecureCoding: true)
+    }
+}
