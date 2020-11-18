@@ -80,7 +80,7 @@ Any `NSObject` which conforms to `NSSecureCoding` can be Persisted too; this wil
 ```swift
 class CloudKitSyncManager {
     @Persisted(archivedDataKey: "ckServerChangeToken")
-    static var changeToken: CKServerChangeToken?
+    var changeToken: CKServerChangeToken?
 }
 ```
 
