@@ -89,12 +89,12 @@ public extension Persisted {
 
     // Note the different parameter name in the following: archivedDataKey vs encodedDataKey vs unnamed. This is reqired since some
     // NSSecureCoding types are also UserDefaultsPrimitive or RawRepresentable. We need a different key to be able to avoid ambiguity.
-    @available(iOS 11.0, *)
+    @available(macOS 10.13, iOS 11.0, watchOS 4.0, tvOS 11.0, *)
     init(archivedDataKey key: String, defaultValue: Exposed, storage: UserDefaults = .standard) where Convertor == ArchivedDataStorageConvertor<NonOptionalExposed>, Exposed == NonOptionalExposed {
         self.init(key: key, defaultValue: defaultValue, valueConvertor: ArchivedDataStorageConvertor(), storage: storage)
     }
 
-    @available(iOS 11.0, *)
+    @available(macOS 10.13, iOS 11.0, watchOS 4.0, tvOS 11.0, *)
     init(archivedDataKey key: String, storage: UserDefaults = .standard) where Convertor == ArchivedDataStorageConvertor<NonOptionalExposed>, Exposed == NonOptionalExposed? {
         self.init(key: key, defaultValue: nil, valueConvertor: ArchivedDataStorageConvertor(), storage: storage)
     }

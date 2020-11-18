@@ -1,7 +1,7 @@
 import XCTest
 @testable import PersistedPropertyWrapper
 
-@available(iOS 11.0, *)
+@available(macOS 10.13, iOS 11.0, watchOS 4.0, tvOS 11.0, *)
 final class ArchivedPropertyWrapperTests: XCTestCase {
     override func setUp() {
         super.setUp()
@@ -27,7 +27,7 @@ final class ArchivedPropertyWrapperTests: XCTestCase {
     }
 }
 
-@available(iOS 11.0, *)
+@available(macOS 10.13, iOS 11.0, watchOS 4.0, tvOS 11.0, *)
 struct PersistedObjectContainer {
     static var defaultValue = ExampleArchivableObject(propertyOne: 23, propertyTwo: "Test string")
     
@@ -38,7 +38,7 @@ struct PersistedObjectContainer {
     static var persistedObjectWithDefault: ExampleArchivableObject
 }
 
-@available(iOS 11.0, *)
+@available(macOS 10.13, iOS 11.0, watchOS 4.0, tvOS 11.0, *)
 class ExampleArchivableObject: NSObject, NSSecureCoding {
     static func == (lhs: ExampleArchivableObject, rhs: ExampleArchivableObject) -> Bool {
         return lhs.propertyOne == rhs.propertyOne && lhs.propertyTwo == rhs.propertyTwo

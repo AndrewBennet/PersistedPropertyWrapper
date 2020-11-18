@@ -46,7 +46,7 @@ public struct CodableStorageConvertor<Exposed>: PersistedStorageConvertor where 
 }
 
 /// Maps between any `NSSecureCoding` conformant `NSObject` instance and `Data`
-@available(iOS 11.0, *)
+@available(macOS 10.13, iOS 11.0, watchOS 4.0, tvOS 11.0, *)
 public struct ArchivedDataStorageConvertor<Exposed>: PersistedStorageConvertor where Exposed: NSObject, Exposed: NSSecureCoding {
     public func convertToExposedType(_ persistedValue: Data) -> Exposed {
         return try! NSKeyedUnarchiver.unarchivedObject(ofClass: Exposed.self, from: persistedValue)!
