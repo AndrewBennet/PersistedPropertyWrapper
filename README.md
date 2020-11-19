@@ -6,7 +6,7 @@
 
 **Persisted Property Wrapper** is a Swift library to enable extremely easy persistance of variables in the [`UserDefaults`](https://developer.apple.com/documentation/foundation/userdefaults) database on Apple platforms.
 
-To use **Persisted Property Wrapper** you simply annotate a variable as being `@Persisted`. It supports the standard `UserDefaults` types (`Int`, `String`, `Bool`, `Date` and more), along with `RawRepresentable` enums where the `RawValue` is storable in `UserDefaults`, as well as any `Codable` type. Plus of course any `Optional` wrapper of any of these types. The type-validity is checked at compile-time: attempting to use on any variables of a non-supported type will cause a compile-time error. 
+To use **Persisted Property Wrapper** you simply annotate a variable as being `@Persisted`. It supports the standard `UserDefaults` types (`Int`, `String`, `Bool`, `Date` and more), along with `RawRepresentable` enums where the `RawValue` is storable in `UserDefaults`, as well as any type which conforms to `Codable` or `NSSecureCoding`. Plus of course any `Optional` wrapper of any of these types. The type-validity is checked at compile-time: attempting to use on any variables of a non-supported type will cause a compile-time error. 
 
 ## Usage
 
