@@ -91,7 +91,7 @@ Note that the argument label `archivedDataKey` must be used. As above, this is r
 ### Alternative Storage
 By default, a `@Persisted` property is stored in the `UserDefaults.standard` database; to store values in a different location, pass the `storage: ` parameter to the property wrapper:
 
-```
+```swift
 extension UserDefaults {
     static var alternative = UserDefaults(suiteName: "alternative")!
 }
