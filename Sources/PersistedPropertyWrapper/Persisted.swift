@@ -41,7 +41,7 @@ import Foundation
             // this cast will always succeed.
             return nonOptionalExposed as! Exposed
         }
-        set {
+        nonmutating set {
             // Setting to nil is taken as an instruction to remove the object from the UserDefaults.
             if let optional = newValue as? AnyOptional, optional.isNil {
                 UserDefaults.standard.removeObject(forKey: key)
@@ -55,6 +55,10 @@ import Foundation
             let valueToStore = valueConvertor.convertToPersistentStorage(nonOptionalNewValue)
             userDefaults.setValue(valueToStore, forKey: key)
         }
+    }
+    
+    public var projectedValue: Self {
+        self
     }
 }
 
