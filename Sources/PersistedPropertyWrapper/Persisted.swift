@@ -1,4 +1,5 @@
 import Foundation
+import os.log
 
 /// Expresses that a property should be read from and saved to `UserDefaults`. Supports properties of the following types: those which can be natively stored in `UserDefaults`,
 /// `RawRepresentable` types where the `RawType` is one which an be natively stored in `UserDefaults`, and any `Codable` type.
@@ -33,7 +34,8 @@ import Foundation
             // not castable, this is a fatal error.
             guard let typelessStored = userDefaults.value(forKey: key) else { return defaultValue }
             guard let stored = typelessStored as? Convertor.Persisted else {
-                fatalError("Value stored at key \(key) was not of type \(String(describing: Convertor.Persisted.self))")
+                os_log("Value stored at key %{public}s was not of type %{public}s", log: .log, type: .error, String(describing: Convertor.Persisted.self))
+                return defaultValue
             }
 
             let nonOptionalExposed = valueConvertor.convertToExposedType(stored)
@@ -44,7 +46,7 @@ import Foundation
         nonmutating set {
             // Setting to nil is taken as an instruction to remove the object from the UserDefaults.
             if let optional = newValue as? AnyOptional, optional.isNil {
-                UserDefaults.standard.removeObject(forKey: key)
+                userDefaults.removeObject(forKey: key)
                 return
             }
 
