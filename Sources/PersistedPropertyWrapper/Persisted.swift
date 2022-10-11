@@ -34,11 +34,14 @@ import os.log
             // not castable, this is a fatal error.
             guard let typelessStored = userDefaults.value(forKey: key) else { return defaultValue }
             guard let stored = typelessStored as? Convertor.Persisted else {
-                os_log("Value stored at key %{public}s was not of type %{public}s", log: .log, type: .error, String(describing: Convertor.Persisted.self))
+                os_log("Value stored at key %{public}s was not of type %{public}s", log: .log, type: .error, key, String(describing: Convertor.Persisted.self))
+                return defaultValue
+            }
+            guard let nonOptionalExposed = valueConvertor.convertToExposedType(stored) else {
+                os_log("Value stored at key %{public}s could not be converted to type %{public}s", log: .log, type: .error, key, String(describing: Convertor.Persisted.self))
                 return defaultValue
             }
 
-            let nonOptionalExposed = valueConvertor.convertToExposedType(stored)
             // Since Exposed is either the same as NonOptionalExposed, or equal to Optional<NonOptionalExposed>,
             // this cast will always succeed.
             return nonOptionalExposed as! Exposed

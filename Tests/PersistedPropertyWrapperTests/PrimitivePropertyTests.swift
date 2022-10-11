@@ -73,7 +73,7 @@ final class PrimitivePropertyWrapperTests: XCTestCase {
     }
 
     private func runPrimitiveStorageTest<T>(_ type: T.Type, operation: (inout T) -> Void) where T: UserDefaultsPrimitive, T: Equatable {
-        var container = PersistedPrimitivePropertyContainer<T>()
+        let container = PersistedPrimitivePropertyContainer<T>()
         let defaultValue = PersistedPrimitivePropertyContainer<T>.defaultValue
         XCTAssertEqual(defaultValue, container.withDefault)
         XCTAssertNil(container.optional)

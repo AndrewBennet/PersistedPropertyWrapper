@@ -25,7 +25,7 @@ final class EnumPropertyWrapperTests: XCTestCase {
     }
 
     private func runEnumStorageTest<T>(_ type: T.Type) where T: RawRepresentable, T.RawValue: UserDefaultsPrimitive, T: CaseIterable {
-        var container = PersistedEnumPropertyContainer<StringEnumeration>()
+        let container = PersistedEnumPropertyContainer<StringEnumeration>()
         let defaultValue = PersistedEnumPropertyContainer<StringEnumeration>.defaultValue
         XCTAssertEqual(defaultValue, container.withDefault)
         XCTAssertNil(container.optional)
