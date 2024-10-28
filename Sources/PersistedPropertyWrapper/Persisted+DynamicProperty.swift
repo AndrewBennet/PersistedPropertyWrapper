@@ -4,7 +4,6 @@
 import SwiftUI
 
 // Enables changes to @Persisted attributed properties to trigger SwiftUI re-renders.
-@available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
 extension Persisted: DynamicProperty { }
 
 #endif

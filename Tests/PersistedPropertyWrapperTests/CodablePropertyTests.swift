@@ -18,37 +18,37 @@ final class CodablePropertyWrapperTests: XCTestCase {
 
     func testCodableStorage() {
         let defaultValue = ExampleStuct()
-        XCTAssertEqual(defaultValue, ExampleStuct.withDefault)
-        XCTAssertNil(ExampleStuct.optional)
+        let codableStructContainer = CodableStructContainer()
+        XCTAssertEqual(defaultValue, codableStructContainer.withDefault)
+        XCTAssertNil(codableStructContainer.optional)
 
-        ExampleStuct.withDefault.integerValue += 1
+        codableStructContainer.withDefault.integerValue += 1
         var defaultCopy = defaultValue
         defaultCopy.integerValue += 1
-        XCTAssertEqual(defaultCopy, ExampleStuct.withDefault)
+        XCTAssertEqual(defaultCopy, codableStructContainer.withDefault)
 
-        ExampleStuct.optional = defaultCopy
-        XCTAssertEqual(defaultCopy, ExampleStuct.optional)
+        codableStructContainer.optional = defaultCopy
+        XCTAssertEqual(defaultCopy, codableStructContainer.optional)
 
-        ExampleStuct.optional = nil
-        XCTAssertEqual(nil, ExampleStuct.optional)
+        codableStructContainer.optional = nil
+        XCTAssertEqual(nil, codableStructContainer.optional)
     }
 
     func testCodableInteger() {
-        // This functionality relies on JSONEncoder being able to encode single values, which it can't do on iOS 12 or lower.
-        if #available(iOS 13.0, tvOS 13.0, *) {
-            let defaultValue = CodableIntegerContainer.defaultValue
-            XCTAssertEqual(defaultValue, CodableIntegerContainer.withDefault)
-            XCTAssertNil(CodableIntegerContainer.optional)
+        let codableIntegerContainer = CodableIntegerContainer()
 
-            CodableIntegerContainer.withDefault += 1
-            XCTAssertEqual(defaultValue + 1, CodableIntegerContainer.withDefault)
+        let defaultValue = CodableIntegerContainer.defaultValue
+        XCTAssertEqual(defaultValue, codableIntegerContainer.withDefault)
+        XCTAssertNil(codableIntegerContainer.optional)
 
-            CodableIntegerContainer.optional = defaultValue
-            XCTAssertEqual(defaultValue, CodableIntegerContainer.optional)
+        codableIntegerContainer.withDefault += 1
+        XCTAssertEqual(defaultValue + 1, codableIntegerContainer.withDefault)
 
-            CodableIntegerContainer.optional = nil
-            XCTAssertNil(CodableIntegerContainer.optional)
-        }
+        codableIntegerContainer.optional = defaultValue
+        XCTAssertEqual(defaultValue, codableIntegerContainer.optional)
+
+        codableIntegerContainer.optional = nil
+        XCTAssertNil(codableIntegerContainer.optional)
     }
 }
 
@@ -69,20 +69,22 @@ struct ExampleStuct: Codable, Equatable {
         optionalIntegerValue = 99
         stringValue = "Hello world!"
     }
+}
 
+struct CodableStructContainer {
     @Persisted(encodedDataKey: UserDefaultsKey.withDefaultValue.rawValue, defaultValue: .init())
-    static var withDefault: ExampleStuct
+    var withDefault: ExampleStuct
 
     @Persisted(encodedDataKey: UserDefaultsKey.optional.rawValue)
-    static var optional: ExampleStuct?
+    var optional: ExampleStuct?
 }
 
 struct CodableIntegerContainer {
-    static var defaultValue: Int { 123 }
+    static let defaultValue = 123
 
     @Persisted(encodedDataKey: UserDefaultsKey.withDefaultValue.rawValue, defaultValue: defaultValue)
-    static var withDefault: Int
+    var withDefault: Int
 
     @Persisted(encodedDataKey: UserDefaultsKey.optional.rawValue)
-    static var optional: Int?
+    var optional: Int?
 }

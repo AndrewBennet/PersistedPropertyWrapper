@@ -1,9 +1,9 @@
-// swift-tools-version:5.3
+// swift-tools-version:6.0
 import PackageDescription
 
 let package = Package(
     name: "PersistedPropertyWrapper",
-    platforms: [.iOS(.v10), .macOS(.v10_13), .tvOS(.v10), .watchOS(.v2)],
+    platforms: [.iOS(.v13), .macOS(.v11), .tvOS(.v13), .watchOS(.v5)],
     products: [
         .library(name: "PersistedPropertyWrapper", targets: ["PersistedPropertyWrapper"])
     ],
@@ -13,5 +13,6 @@ let package = Package(
             name: "PersistedPropertyWrapperTests",
             dependencies: ["PersistedPropertyWrapper"]
         )
-    ]
+    ],
+    swiftLanguageModes: [.v6]
 )

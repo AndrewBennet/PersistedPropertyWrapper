@@ -1,11 +1,12 @@
 import Foundation
+import Combine
 import os.log
 
 /// Expresses that a property should be read from and saved to `UserDefaults`. Supports properties of the following types: those which can be natively stored in `UserDefaults`,
 /// `RawRepresentable` types where the `RawType` is one which an be natively stored in `UserDefaults`, and any `Codable` type.
 @propertyWrapper public struct Persisted<Exposed, NonOptionalExposed, Convertor> where Convertor: PersistedStorageConvertor, Convertor.Exposed == NonOptionalExposed {
     // The use of the two generic arguments relating to Exposed is necessary as we want to be able to use this property wrapped
-    //on properties of type Optional<T>, but also inspect the underlying type T. We cannot check whether a generic type is an
+    // on properties of type Optional<T>, but also inspect the underlying type T. We cannot check whether a generic type is an
     // Optional<T>, so instead we provide two 'slots' for the types: the Exposed type (which may be optional), and the NonOptionalExposed
     // type. If Exposed is equal to Optional<T>, then NonOptionalExposed must be equal to T; otherwise NonOptionalExposed must
     // be equal to Exposed.
@@ -13,6 +14,8 @@ import os.log
     let defaultValue: Exposed
     private let valueConvertor: Convertor
     private let userDefaults: UserDefaults
+    private let changeObserver: UserDefaultsObserver
+    private let publisher: CurrentValueSubject<Exposed, Never>
 
     // Initialiser is private so that we can selectively expose the overloads with/without default value parameter
     // depending on whether the exposed type is Optional.
@@ -26,25 +29,39 @@ import os.log
         self.defaultValue = defaultValue
         self.valueConvertor = valueConvertor
         self.userDefaults = storage
+        self.changeObserver = UserDefaultsObserver(userDefaults: userDefaults, key: key)
+
+        let initialValue = Self.getExposedValue(userDefaults: storage, key: key, defaultValue: defaultValue, valueConvertor: valueConvertor)
+        let publisher = CurrentValueSubject<Exposed, Never>(initialValue)
+        self.publisher = publisher
+
+        changeObserver.registerObserver {
+            let currentValue = Self.getExposedValue(userDefaults: storage, key: key, defaultValue: defaultValue, valueConvertor: valueConvertor)
+            publisher.send(currentValue)
+        }
+    }
+
+    private static func getExposedValue(userDefaults: UserDefaults, key: String, defaultValue: Exposed, valueConvertor: Convertor) -> Exposed {
+        // Get the object stored for the given key, and cast it to the Stored type. If the object is present but
+        // not castable, this is a fatal error.
+        guard let typelessStored = userDefaults.value(forKey: key) else { return defaultValue }
+        guard let stored = typelessStored as? Convertor.Persisted else {
+            os_log("Value stored at key %{public}s was not of type %{public}s", log: .log, type: .error, key, String(describing: Convertor.Persisted.self))
+            return defaultValue
+        }
+        guard let nonOptionalExposed = valueConvertor.convertToExposedType(stored) else {
+            os_log("Value stored at key %{public}s could not be converted to type %{public}s", log: .log, type: .error, key, String(describing: Convertor.Persisted.self))
+            return defaultValue
+        }
+
+        // Since Exposed is either the same as NonOptionalExposed, or equal to Optional<NonOptionalExposed>,
+        // this cast will always succeed.
+        return nonOptionalExposed as! Exposed
     }
 
     public var wrappedValue: Exposed {
         get {
-            // Get the object stored for the given key, and cast it to the Stored type. If the object is present but
-            // not castable, this is a fatal error.
-            guard let typelessStored = userDefaults.value(forKey: key) else { return defaultValue }
-            guard let stored = typelessStored as? Convertor.Persisted else {
-                os_log("Value stored at key %{public}s was not of type %{public}s", log: .log, type: .error, key, String(describing: Convertor.Persisted.self))
-                return defaultValue
-            }
-            guard let nonOptionalExposed = valueConvertor.convertToExposedType(stored) else {
-                os_log("Value stored at key %{public}s could not be converted to type %{public}s", log: .log, type: .error, key, String(describing: Convertor.Persisted.self))
-                return defaultValue
-            }
-
-            // Since Exposed is either the same as NonOptionalExposed, or equal to Optional<NonOptionalExposed>,
-            // this cast will always succeed.
-            return nonOptionalExposed as! Exposed
+            Self.getExposedValue(userDefaults: userDefaults, key: key, defaultValue: defaultValue, valueConvertor: valueConvertor)
         }
         nonmutating set {
             // Setting to nil is taken as an instruction to remove the object from the UserDefaults.
@@ -62,8 +79,8 @@ import os.log
         }
     }
     
-    public var projectedValue: Self {
-        self
+    public var projectedValue: AnyPublisher<Exposed, Never> {
+        publisher.eraseToAnyPublisher()
     }
 }
 
@@ -98,12 +115,10 @@ public extension Persisted {
 
     // Note the different parameter name in the following: archivedDataKey vs encodedDataKey vs unnamed. This is reqired since some
     // NSSecureCoding types are also UserDefaultsPrimitive or RawRepresentable. We need a different key to be able to avoid ambiguity.
-    @available(macOS 10.13, iOS 11.0, watchOS 4.0, tvOS 11.0, *)
     init(archivedDataKey key: String, defaultValue: Exposed, storage: UserDefaults = .standard) where Convertor == ArchivedDataStorageConvertor<NonOptionalExposed>, Exposed == NonOptionalExposed {
         self.init(key: key, defaultValue: defaultValue, valueConvertor: ArchivedDataStorageConvertor(), storage: storage)
     }
 
-    @available(macOS 10.13, iOS 11.0, watchOS 4.0, tvOS 11.0, *)
     init(archivedDataKey key: String, storage: UserDefaults = .standard) where Convertor == ArchivedDataStorageConvertor<NonOptionalExposed>, Exposed == NonOptionalExposed? {
         self.init(key: key, defaultValue: nil, valueConvertor: ArchivedDataStorageConvertor(), storage: storage)
     }

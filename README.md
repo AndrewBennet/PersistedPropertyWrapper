@@ -72,8 +72,6 @@ var storedAsInteger: Int
 var storedAsData: Int
 ```
 
-**Note:** on iOS 12, using the `encodedDataKey` initializer with a value which would encode to a JSON _fragment_ (e.g. `Int`, `String`, `Bool`, etc) will cause a crash. This is due to a [bug in the Swift runtime](https://bugs.swift.org/browse/SR-6163) shipped prior to iOS 13. Using `encodedDataKey` has no benefit in these cases anyway.
-
 ### Storing types which implement `NSCoding`
 Any `NSObject` which conforms to `NSSecureCoding` can be Persisted too; this will store in UserDefaults the encoded representation of the object obtained from `NSKeyedArchiver`. For example:
 
@@ -107,8 +105,8 @@ However, during development of [my app](https://github.com/AndrewBennet/ReadingL
 
 ## Requirements
 
-- Xcode 12
-- Swift 5.3
+- Xcode 16
+- Swift 6.0
 
 ## Installation
 
@@ -118,7 +116,7 @@ Add `https://github.com/AndrewBennet/PersistedPropertyWrapper.git` as a Swift Pa
 ### CocoaPods
 To install via CocoaPods, add the following line to your Podfile:
 ```
-pod 'PersistedPropertyWrapper', '~> 2.0'
+pod 'PersistedPropertyWrapper', '~> 3.0'
 ```
 
 ### Manually

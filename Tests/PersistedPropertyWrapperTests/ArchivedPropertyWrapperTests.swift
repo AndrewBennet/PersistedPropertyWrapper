@@ -1,7 +1,6 @@
 import XCTest
 @testable import PersistedPropertyWrapper
 
-@available(macOS 10.13, iOS 11.0, watchOS 4.0, tvOS 11.0, *)
 final class ArchivedPropertyWrapperTests: XCTestCase {
     override func setUp() {
         super.setUp()
@@ -18,28 +17,27 @@ final class ArchivedPropertyWrapperTests: XCTestCase {
     }
 
     func testAchivedObjectStorage() {
-        XCTAssertEqual(PersistedObjectContainer.defaultValue, PersistedObjectContainer.persistedObjectWithDefault)
-        
-        XCTAssertNil(PersistedObjectContainer.persistedObjectWithoutDefault)
+        let container = PersistedObjectContainer()
+        XCTAssertEqual(PersistedObjectContainer.defaultValue, container.persistedObjectWithDefault)
+
+        XCTAssertNil(container.persistedObjectWithoutDefault)
         let newObject = ExampleArchivableObject(propertyOne: 99, propertyTwo: "Another String")
-        PersistedObjectContainer.persistedObjectWithoutDefault = newObject
-        XCTAssertEqual(newObject, PersistedObjectContainer.persistedObjectWithoutDefault)
+        container.persistedObjectWithoutDefault = newObject
+        XCTAssertEqual(newObject, container.persistedObjectWithoutDefault)
     }
 }
 
-@available(macOS 10.13, iOS 11.0, watchOS 4.0, tvOS 11.0, *)
 struct PersistedObjectContainer {
-    static var defaultValue = ExampleArchivableObject(propertyOne: 23, propertyTwo: "Test string")
-    
+    static let defaultValue = ExampleArchivableObject(propertyOne: 23, propertyTwo: "Test string")
+
     @Persisted(archivedDataKey: "persistedObject1")
-    static var persistedObjectWithoutDefault: ExampleArchivableObject?
+    var persistedObjectWithoutDefault: ExampleArchivableObject?
     
     @Persisted(archivedDataKey: "persistedObject2", defaultValue: defaultValue)
-    static var persistedObjectWithDefault: ExampleArchivableObject
+    var persistedObjectWithDefault: ExampleArchivableObject
 }
 
-@available(macOS 10.13, iOS 11.0, watchOS 4.0, tvOS 11.0, *)
-class ExampleArchivableObject: NSObject, NSSecureCoding {
+final class ExampleArchivableObject: NSObject, NSSecureCoding, Sendable {
     static func == (lhs: ExampleArchivableObject, rhs: ExampleArchivableObject) -> Bool {
         return lhs.propertyOne == rhs.propertyOne && lhs.propertyTwo == rhs.propertyTwo
     }
