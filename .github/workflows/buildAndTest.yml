@@ -4,8 +4,20 @@ jobs:
   build:
     runs-on: macos-latest
     steps:
-    - uses: actions/checkout@v4
-    - name: Build
-      run: swift build -v
-    - name: Run tests
-      run: swift test -v
+      - uses: actions/checkout@v3
+      - name: Cache Swift
+        uses: actions/cache@v3
+        with:
+          path: /usr/local/Cellar/swift
+          key: ${{ runner.os }}-swift-${{ hashFiles('**/Package.resolved') }}
+          restore-keys: |
+            ${{ runner.os }}-swift-
+      - name: Install Swift 6
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: |
+          brew install swift
+          swift --version
+      - name: Build
+        run: swift build -v
+      - name: Run tests
+        run: swift test -v
