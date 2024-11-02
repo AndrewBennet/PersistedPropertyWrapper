@@ -44,6 +44,14 @@ public struct PersistedState<Exposed, NonOptionalExposed, Convertor>: DynamicPro
             persistedObserver.value = newValue
         }
     }
+
+    /// Returns a binding to the persisted value.
+    public var projectedValue: Binding<Exposed> {
+        Binding<Exposed>(
+            get: { wrappedValue },
+            set: { wrappedValue = $0 }
+        )
+    }
 }
 
 // MARK: Initialisers
