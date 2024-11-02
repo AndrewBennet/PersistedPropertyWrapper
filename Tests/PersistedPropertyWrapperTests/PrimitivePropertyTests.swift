@@ -70,7 +70,7 @@ struct PrimitivePropertyWrapperTests {
     }
 }
 
-protocol TestablePrimitive: UserDefaultsPrimitive {
+protocol TestablePrimitive: UserDefaultsPrimitive, Sendable {
     static var defaultValue: Self { get }
 }
 
@@ -123,9 +123,9 @@ extension [String: Int]: TestablePrimitive {
 }
 
 struct PersistedPrimitivePropertyContainer<T> where T: TestablePrimitive {
-    @PersistedValue(UUID().uuidString, defaultValue: T.defaultValue)
+    @Persisted(UUID().uuidString, defaultValue: T.defaultValue)
     var withDefault: T
 
-    @PersistedValue(UUID().uuidString)
+    @Persisted(UUID().uuidString)
     var optional: T?
 }

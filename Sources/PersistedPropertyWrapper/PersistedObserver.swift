@@ -4,11 +4,11 @@ import os.log
 
 /// An object that, upon initialisation, adds itself as an observer of the provided `UserDefaults` for the given `key`, and updates its
 /// `@Published` `propertyValue` property
-class PersistedObserver<Exposed, NonOptionalExposed, Convertor> : NSObject, ObservableObject where Convertor: PersistedStorageConvertor,
-                                                                                                   Convertor.Exposed == NonOptionalExposed {
+class PersistedObserver<Exposed, NonOptionalExposed, Convertor>: NSObject, ObservableObject
+    where Exposed: Sendable, Convertor: PersistedStorageConvertor, Convertor.Exposed == NonOptionalExposed {
     private let key: String
     private let userDefaults: UserDefaults
-    private let persistedStorage: PersistedValue<Exposed, NonOptionalExposed, Convertor>
+    private let persistedStorage: Persisted<Exposed, NonOptionalExposed, Convertor>
 
     init(key: String, defaultValue: Exposed, valueConvertor: Convertor, storage: UserDefaults) {
         print("init for \(key)")
@@ -19,7 +19,7 @@ class PersistedObserver<Exposed, NonOptionalExposed, Convertor> : NSObject, Obse
         }
         self.key = key
         self.userDefaults = storage
-        self.persistedStorage = PersistedValue(key: key, defaultValue: defaultValue, valueConvertor: valueConvertor, storage: storage)
+        self.persistedStorage = Persisted(key: key, defaultValue: defaultValue, valueConvertor: valueConvertor, storage: storage)
         self.value = persistedStorage.wrappedValue
 
         super.init()

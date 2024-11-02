@@ -4,18 +4,18 @@ import Foundation
 
 @Suite
 struct CodablePropertyWrapperTests {
-    @PersistedValue(encodedDataKey: UUID().uuidString, defaultValue: .init(), storage: .testing)
+    @Persisted(encodedDataKey: UUID().uuidString, defaultValue: .init(), storage: .testing)
     var structWithDefault: ExampleStuct
 
-    @PersistedValue(encodedDataKey: UUID().uuidString, storage: .testing)
+    @Persisted(encodedDataKey: UUID().uuidString, storage: .testing)
     var structOptional: ExampleStuct?
 
     static let defaultIntValue = 123
 
-    @PersistedValue(encodedDataKey: UUID().uuidString, defaultValue: defaultIntValue, storage: .testing)
+    @Persisted(encodedDataKey: UUID().uuidString, defaultValue: defaultIntValue, storage: .testing)
     var intWithDefault: Int
 
-    @PersistedValue(encodedDataKey: UUID().uuidString, storage: .testing)
+    @Persisted(encodedDataKey: UUID().uuidString, storage: .testing)
     var intOptional: Int?
 
     @Test

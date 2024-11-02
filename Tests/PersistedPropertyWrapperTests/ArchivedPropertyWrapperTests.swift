@@ -6,10 +6,10 @@ import Foundation
 struct ArchivedPropertyWrapperTests {
     static let defaultValue = ExampleArchivableObject(propertyOne: 23, propertyTwo: "Test string")
 
-    @PersistedValue(archivedDataKey: UUID().uuidString, storage: .testing)
+    @Persisted(archivedDataKey: UUID().uuidString, storage: .testing)
     var persistedObjectWithoutDefault: ExampleArchivableObject?
 
-    @PersistedValue(archivedDataKey: UUID().uuidString, defaultValue: defaultValue, storage: .testing)
+    @Persisted(archivedDataKey: UUID().uuidString, defaultValue: defaultValue, storage: .testing)
     var persistedObjectWithDefault: ExampleArchivableObject
 
     @Test

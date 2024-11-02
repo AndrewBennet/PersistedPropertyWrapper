@@ -4,16 +4,16 @@ import Foundation
 
 @Suite
 struct EnumPropertyWrapperTests {
-    @PersistedValue(UUID().uuidString, defaultValue: IntegerEnumeration.allCases.first!, storage: .testing)
+    @Persisted(UUID().uuidString, defaultValue: IntegerEnumeration.allCases.first!, storage: .testing)
     var intWithDefault: IntegerEnumeration
 
-    @PersistedValue(UUID().uuidString, storage: .testing)
+    @Persisted(UUID().uuidString, storage: .testing)
     var intOptional: IntegerEnumeration?
 
-    @PersistedValue(UUID().uuidString, defaultValue: StringEnumeration.allCases.first!, storage: .testing)
+    @Persisted(UUID().uuidString, defaultValue: StringEnumeration.allCases.first!, storage: .testing)
     var stringWithDefault: StringEnumeration
 
-    @PersistedValue(UUID().uuidString, storage: .testing)
+    @Persisted(UUID().uuidString, storage: .testing)
     var stringOptional: StringEnumeration?
 
     @Test

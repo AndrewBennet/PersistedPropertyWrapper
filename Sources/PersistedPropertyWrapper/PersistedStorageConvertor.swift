@@ -1,7 +1,7 @@
 import Foundation
 
 /// A utility which can convert between an exposed type and a type which can be stored in `UserDefaults`.
-public protocol PersistedStorageConvertor {
+public protocol PersistedStorageConvertor: Sendable {
     associatedtype Exposed
     associatedtype Persisted: UserDefaultsPrimitive
 
