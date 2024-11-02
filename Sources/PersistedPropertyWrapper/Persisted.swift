@@ -4,7 +4,7 @@ import os.log
 /// A property wrapper that reads from and writes to a UserDefaults store.
 /// Supports properties of the following types: those which can be natively stored in `UserDefaults`,
 /// `RawRepresentable` types where the `RawType` is one which an be natively stored in `UserDefaults`, and any `Codable` type.
-/// If you wish to use a persisted value in SwiftUI and have changes trigger view updates, use `@Persisted` instead.
+/// If you wish to use a persisted value in SwiftUI and have changes trigger view updates, use `@PersistedState` instead.
 @propertyWrapper
 public struct Persisted<Exposed, NonOptionalExposed, Convertor>: Sendable
     where Convertor: PersistedStorageConvertor, Convertor.Exposed == NonOptionalExposed, Exposed: Sendable {
