@@ -3,7 +3,7 @@ import PackageDescription
 
 let package = Package(
     name: "PersistedPropertyWrapper",
-    platforms: [.iOS(.v13), .macOS(.v11), .tvOS(.v13), .watchOS(.v5)],
+    platforms: [.iOS(.v14), .macOS(.v11), .tvOS(.v14), .watchOS(.v7)],
     products: [
         .library(name: "PersistedPropertyWrapper", targets: ["PersistedPropertyWrapper"])
     ],

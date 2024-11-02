@@ -1,138 +1,131 @@
-import XCTest
+import Testing
+import Foundation
 @testable import PersistedPropertyWrapper
 
-final class PrimitivePropertyWrapperTests: XCTestCase {
-    override func setUp() {
-        super.setUp()
-        for key in UserDefaultsKey.allCases {
-            UserDefaults.standard.removeObject(forKey: key.rawValue)
-        }
-    }
-
-    override func tearDown() {
-       super.tearDown()
-       for key in UserDefaultsKey.allCases {
-           UserDefaults.standard.removeObject(forKey: key.rawValue)
-       }
-   }
-
-    func testIntegerStorage() {
+@Suite
+struct PrimitivePropertyWrapperTests {
+    @Test func testIntegerStorage() {
         runPrimitiveStorageTest(Int.self) { $0 += 1 }
     }
 
-    func testInt16Storage() {
+    @Test func testInt16Storage() {
         runPrimitiveStorageTest(Int16.self) { $0 += 1 }
     }
 
-    func testInt32Storage() {
+    @Test func testInt32Storage() {
         runPrimitiveStorageTest(Int32.self) { $0 += 1 }
     }
 
-    func testInt64Storage() {
+    @Test func testInt64Storage() {
         runPrimitiveStorageTest(Int64.self) { $0 += 1 }
     }
 
-    func testStringStorage() {
+    @Test func testStringStorage() {
         runPrimitiveStorageTest(String.self) { $0 += "World!" }
     }
 
-    func testBoolStorage() {
+    @Test func testBoolStorage() {
         runPrimitiveStorageTest(Bool.self) { $0.toggle() }
     }
 
-    func testDataStorage() {
+    @Test func testDataStorage() {
         runPrimitiveStorageTest(Data.self) { $0.append("World!".data(using: .utf8)!) }
     }
 
-    func testFloatStorage() {
+    @Test func testFloatStorage() {
         runPrimitiveStorageTest(Float.self) { $0.round(.up) }
     }
 
-    func testDoubleStorage() {
+    @Test func testDoubleStorage() {
         runPrimitiveStorageTest(Double.self) { $0.round(.down) }
     }
 
-    func testDateStorage() {
+    @Test func testDateStorage() {
         runPrimitiveStorageTest(Date.self) { $0.addTimeInterval(100000) }
     }
 
-    func testIntArrayStorage() {
-        runPrimitiveStorageTest([Int].self) { $0.append(123) }
-    }
-
-    func testStringArrayStorage() {
+    @Test func testStringArrayStorage() {
         runPrimitiveStorageTest([String].self) { $0.append("!!!") }
     }
-    
-    func testDateArrayStorage() {
-        runPrimitiveStorageTest([Date].self) { $0.removeAll() }
-    }
-    
-    func testDataArrayStorage() {
-        runPrimitiveStorageTest([Data].self) { $0[0].append("!".data(using: .utf8)!) }
+
+    @Test func testDictionaryStorage() {
+        runPrimitiveStorageTest([String: Int].self) { $0["XYZ"] = 123 }
     }
 
-    private func runPrimitiveStorageTest<T>(_ type: T.Type, operation: (inout T) -> Void) where T: UserDefaultsPrimitive, T: Equatable {
+    private func runPrimitiveStorageTest<T>(_ type: T.Type, operation: (inout T) -> Void) where T: TestablePrimitive, T: Equatable {
         let container = PersistedPrimitivePropertyContainer<T>()
-        let defaultValue = PersistedPrimitivePropertyContainer<T>.defaultValue
-        XCTAssertEqual(defaultValue, container.withDefault)
-        XCTAssertNil(container.optional)
+        #expect(T.defaultValue == container.withDefault)
+        #expect(container.optional == nil)
 
         operation(&container.withDefault)
-        var defaultValueCopy = defaultValue
+        var defaultValueCopy = T.defaultValue
         operation(&defaultValueCopy)
-        XCTAssertEqual(defaultValueCopy, container.withDefault)
+        #expect(defaultValueCopy == container.withDefault)
 
-        container.optional = defaultValue
-        XCTAssertEqual(defaultValue, container.optional)
+        container.optional = T.defaultValue
+        #expect(T.defaultValue == container.optional)
 
         container.optional = nil
-        XCTAssertNil(container.optional)
+        #expect(container.optional == nil)
     }
 }
 
-struct PersistedPrimitivePropertyContainer<T> where T: UserDefaultsPrimitive {
-    static var defaultValue: T {
-        _defaultValue as! T
-    }
+protocol TestablePrimitive: UserDefaultsPrimitive {
+    static var defaultValue: Self { get }
+}
 
-    private static var _defaultValue: UserDefaultsPrimitive {
-        if T.self == Int.self {
-            return 42
-        } else if T.self == Int16.self {
-            return 42 as Int16
-        } else if T.self == Int32.self {
-           return 42 as Int32
-        } else if T.self == Int64.self {
-            return 42 as Int64
-        } else if T.self == String.self {
-            return "Hello"
-        } else if T.self == Bool.self {
-            return true
-        } else if T.self == Data.self {
-            return "Hello".data(using: .utf8)!
-        } else if T.self == Float.self {
-            return 99.9 as Float
-        } else if T.self == Double.self {
-            return 101.1 as Double
-        } else if T.self == Date.self {
-            return Date(timeIntervalSince1970: 1593197020)
-        } else if T.self == [String].self {
-            return ["Hello", "World"]
-        } else if T.self == [Int].self {
-            return [1, 2, 3]
-        } else if T.self == [Date].self {
-            return [Date(timeIntervalSince1970: 1593197020)]
-        } else if T.self == [Data].self {
-            return ["Hello".data(using: .utf8)!, "World".data(using: .utf8)!]
-        } else {
-            preconditionFailure()
-        }
-    }
+extension Int: TestablePrimitive {
+    static var defaultValue: Int { 42 }
+}
 
-    @Persisted(UserDefaultsKey.withDefaultValue.rawValue, defaultValue: defaultValue)
+extension Int16: TestablePrimitive {
+    static var defaultValue: Int16 { 42 }
+}
+
+extension Int32: TestablePrimitive {
+    static var defaultValue: Int32 { 42 }
+}
+
+extension Int64: TestablePrimitive {
+    static var defaultValue: Int64 { 42 }
+}
+
+extension String: TestablePrimitive {
+    static var defaultValue: String { "Hello" }
+}
+
+extension Bool: TestablePrimitive {
+    static var defaultValue: Bool { true }
+}
+
+extension Data: TestablePrimitive {
+    static var defaultValue: Data { "Hello".data(using: .utf8)! }
+}
+
+extension Float: TestablePrimitive {
+    static var defaultValue: Float { 99.9 }
+}
+
+extension Double: TestablePrimitive {
+    static var defaultValue: Double { 101.1 }
+}
+
+extension Date: TestablePrimitive {
+    static var defaultValue: Date { Date(timeIntervalSince1970: 1593197020) }
+}
+
+extension Array: TestablePrimitive where Element == String {
+    static var defaultValue: [String] { ["Hello", "World"] }
+}
+
+extension [String: Int]: TestablePrimitive {
+    static var defaultValue: [String: Int] { ["Hello": 1, "World": 2] }
+}
+
+struct PersistedPrimitivePropertyContainer<T> where T: TestablePrimitive {
+    @PersistedValue(UUID().uuidString, defaultValue: T.defaultValue)
     var withDefault: T
 
-    @Persisted(UserDefaultsKey.optional.rawValue)
+    @PersistedValue(UUID().uuidString)
     var optional: T?
 }

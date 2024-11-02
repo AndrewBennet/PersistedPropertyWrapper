@@ -1,40 +1,34 @@
-import XCTest
+import Testing
+import Foundation
 @testable import PersistedPropertyWrapper
 
-final class ArchivedPropertyWrapperTests: XCTestCase {
-    override func setUp() {
-        super.setUp()
-        for key in UserDefaultsKey.allCases {
-            UserDefaults.standard.removeObject(forKey: key.rawValue)
-        }
-    }
+@Suite
+struct ArchivedPropertyWrapperTests {
+    static let defaultValue = ExampleArchivableObject(propertyOne: 23, propertyTwo: "Test string")
 
-    override func tearDown() {
-       super.tearDown()
-       for key in UserDefaultsKey.allCases {
-           UserDefaults.standard.removeObject(forKey: key.rawValue)
-       }
-    }
+    @PersistedValue(archivedDataKey: UUID().uuidString, storage: .testing)
+    var persistedObjectWithoutDefault: ExampleArchivableObject?
 
+    @PersistedValue(archivedDataKey: UUID().uuidString, defaultValue: defaultValue, storage: .testing)
+    var persistedObjectWithDefault: ExampleArchivableObject
+
+    @Test
     func testAchivedObjectStorage() {
-        let container = PersistedObjectContainer()
-        XCTAssertEqual(PersistedObjectContainer.defaultValue, container.persistedObjectWithDefault)
+        #expect(Self.defaultValue == persistedObjectWithDefault)
+        #expect(persistedObjectWithoutDefault == nil)
 
-        XCTAssertNil(container.persistedObjectWithoutDefault)
         let newObject = ExampleArchivableObject(propertyOne: 99, propertyTwo: "Another String")
-        container.persistedObjectWithoutDefault = newObject
-        XCTAssertEqual(newObject, container.persistedObjectWithoutDefault)
+        persistedObjectWithoutDefault = newObject
+        #expect(newObject == persistedObjectWithoutDefault)
     }
 }
 
-struct PersistedObjectContainer {
-    static let defaultValue = ExampleArchivableObject(propertyOne: 23, propertyTwo: "Test string")
-
-    @Persisted(archivedDataKey: "persistedObject1")
-    var persistedObjectWithoutDefault: ExampleArchivableObject?
-    
-    @Persisted(archivedDataKey: "persistedObject2", defaultValue: defaultValue)
-    var persistedObjectWithDefault: ExampleArchivableObject
+fileprivate extension UserDefaults {
+    nonisolated(unsafe) static let testing: UserDefaults = {
+        let defaults = UserDefaults(suiteName: #file)!
+        defaults.removePersistentDomain(forName: #file)
+        return defaults
+    }()
 }
 
 final class ExampleArchivableObject: NSObject, NSSecureCoding, Sendable {
@@ -53,7 +47,7 @@ final class ExampleArchivableObject: NSObject, NSSecureCoding, Sendable {
 
     required init?(coder: NSCoder) {
         propertyOne = coder.decodeInteger(forKey: "propertyOne")
-        propertyTwo = coder.decodeObject(forKey: "propertyTwo") as! String
+        propertyTwo = coder.decodeObject(of: NSString.self, forKey: "propertyTwo")! as String
     }
 
     init(propertyOne: Int, propertyTwo: String) {

@@ -1,60 +1,58 @@
-import XCTest
+import Testing
+import Foundation
 @testable import PersistedPropertyWrapper
 
-final class EnumPropertyWrapperTests: XCTestCase {
-    override func setUp() {
-        super.setUp()
-        for key in UserDefaultsKey.allCases {
-            UserDefaults.standard.removeObject(forKey: key.rawValue)
-        }
-    }
+@Suite
+struct EnumPropertyWrapperTests {
+    @PersistedValue(UUID().uuidString, defaultValue: IntegerEnumeration.allCases.first!, storage: .testing)
+    var intWithDefault: IntegerEnumeration
 
-    override func tearDown() {
-       super.tearDown()
-       for key in UserDefaultsKey.allCases {
-           UserDefaults.standard.removeObject(forKey: key.rawValue)
-       }
-    }
+    @PersistedValue(UUID().uuidString, storage: .testing)
+    var intOptional: IntegerEnumeration?
 
+    @PersistedValue(UUID().uuidString, defaultValue: StringEnumeration.allCases.first!, storage: .testing)
+    var stringWithDefault: StringEnumeration
+
+    @PersistedValue(UUID().uuidString, storage: .testing)
+    var stringOptional: StringEnumeration?
+
+    @Test
     func testEnumStringStorage() {
-        runEnumStorageTest(StringEnumeration.self)
+        #expect(stringWithDefault == .hello)
+        #expect(stringOptional == nil)
+
+        stringWithDefault = .world
+        #expect(stringWithDefault == .world)
+
+        stringOptional = .world
+        #expect(stringOptional == .world)
+
+        stringOptional = nil
+        #expect(stringOptional == nil)
     }
 
+    @Test
     func testEnumIntStorage() {
-        runEnumStorageTest(IntegerEnumeration.self)
-    }
+        #expect(intWithDefault == .zero)
+        #expect(intOptional == nil)
 
-    private func runEnumStorageTest<T>(_ type: T.Type) where T: RawRepresentable, T.RawValue: UserDefaultsPrimitive, T: CaseIterable {
-        let container = PersistedEnumPropertyContainer<StringEnumeration>()
-        let defaultValue = PersistedEnumPropertyContainer<StringEnumeration>.defaultValue
-        XCTAssertEqual(defaultValue, container.withDefault)
-        XCTAssertNil(container.optional)
+        intWithDefault = .two
+        #expect(intWithDefault == .two)
 
-        guard let otherValue = StringEnumeration.allCases.filter({ $0 != defaultValue }).first else {
-            preconditionFailure()
-        }
-        container.withDefault = otherValue
-        XCTAssertEqual(otherValue, container.withDefault)
+        intOptional = .two
+        #expect(intOptional == .two)
 
-        container.optional = otherValue
-        XCTAssertEqual(otherValue, container.optional)
-
-        container.optional = nil
-        XCTAssertNil(container.optional)
+        intOptional = nil
+        #expect(intOptional == nil)
     }
 }
 
-struct PersistedEnumPropertyContainer<T> where T: RawRepresentable, T: CaseIterable, T.RawValue: UserDefaultsPrimitive {
-    static var defaultValue: T {
-        guard let firstCase = T.allCases.first else { preconditionFailure() }
-        return firstCase
-    }
-
-    @Persisted(UserDefaultsKey.withDefaultValue.rawValue, defaultValue: defaultValue)
-    var withDefault: T
-
-    @Persisted(UserDefaultsKey.optional.rawValue)
-    var optional: T?
+fileprivate extension UserDefaults {
+    nonisolated(unsafe) static let testing: UserDefaults = {
+        let defaults = UserDefaults(suiteName: #file)!
+        defaults.removePersistentDomain(forName: #file)
+        return defaults
+    }()
 }
 
 enum IntegerEnumeration: Int, CaseIterable {

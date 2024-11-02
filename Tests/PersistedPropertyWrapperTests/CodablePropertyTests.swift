@@ -1,55 +1,63 @@
-import XCTest
+import Testing
+import Foundation
 @testable import PersistedPropertyWrapper
 
-final class CodablePropertyWrapperTests: XCTestCase {
-    override func setUp() {
-        super.setUp()
-        for key in UserDefaultsKey.allCases {
-            UserDefaults.standard.removeObject(forKey: key.rawValue)
-        }
-    }
+@Suite
+struct CodablePropertyWrapperTests {
+    @PersistedValue(encodedDataKey: UUID().uuidString, defaultValue: .init(), storage: .testing)
+    var structWithDefault: ExampleStuct
 
-    override func tearDown() {
-       super.tearDown()
-       for key in UserDefaultsKey.allCases {
-           UserDefaults.standard.removeObject(forKey: key.rawValue)
-       }
-    }
+    @PersistedValue(encodedDataKey: UUID().uuidString, storage: .testing)
+    var structOptional: ExampleStuct?
 
+    static let defaultIntValue = 123
+
+    @PersistedValue(encodedDataKey: UUID().uuidString, defaultValue: defaultIntValue, storage: .testing)
+    var intWithDefault: Int
+
+    @PersistedValue(encodedDataKey: UUID().uuidString, storage: .testing)
+    var intOptional: Int?
+
+    @Test
     func testCodableStorage() {
         let defaultValue = ExampleStuct()
-        let codableStructContainer = CodableStructContainer()
-        XCTAssertEqual(defaultValue, codableStructContainer.withDefault)
-        XCTAssertNil(codableStructContainer.optional)
+        #expect(defaultValue == structWithDefault)
+        #expect(structOptional == nil)
 
-        codableStructContainer.withDefault.integerValue += 1
+        structWithDefault.integerValue += 1
         var defaultCopy = defaultValue
         defaultCopy.integerValue += 1
-        XCTAssertEqual(defaultCopy, codableStructContainer.withDefault)
+        #expect(defaultCopy == structWithDefault)
 
-        codableStructContainer.optional = defaultCopy
-        XCTAssertEqual(defaultCopy, codableStructContainer.optional)
+        structOptional = defaultCopy
+        #expect(defaultCopy == structOptional)
 
-        codableStructContainer.optional = nil
-        XCTAssertEqual(nil, codableStructContainer.optional)
+        structOptional = nil
+        #expect(structOptional == nil)
     }
 
+    @Test
     func testCodableInteger() {
-        let codableIntegerContainer = CodableIntegerContainer()
+        #expect(Self.defaultIntValue == intWithDefault)
+        #expect(intOptional == nil)
 
-        let defaultValue = CodableIntegerContainer.defaultValue
-        XCTAssertEqual(defaultValue, codableIntegerContainer.withDefault)
-        XCTAssertNil(codableIntegerContainer.optional)
+        intWithDefault += 1
+        #expect(Self.defaultIntValue + 1 == intWithDefault)
 
-        codableIntegerContainer.withDefault += 1
-        XCTAssertEqual(defaultValue + 1, codableIntegerContainer.withDefault)
+        intOptional = Self.defaultIntValue
+        #expect(Self.defaultIntValue == intOptional)
 
-        codableIntegerContainer.optional = defaultValue
-        XCTAssertEqual(defaultValue, codableIntegerContainer.optional)
-
-        codableIntegerContainer.optional = nil
-        XCTAssertNil(codableIntegerContainer.optional)
+        intOptional = nil
+        #expect(intOptional == nil)
     }
+}
+
+fileprivate extension UserDefaults {
+    nonisolated(unsafe) static let testing: UserDefaults = {
+        let defaults = UserDefaults(suiteName: #file)!
+        defaults.removePersistentDomain(forName: #file)
+        return defaults
+    }()
 }
 
 struct ExampleStuct: Codable, Equatable {
@@ -69,22 +77,4 @@ struct ExampleStuct: Codable, Equatable {
         optionalIntegerValue = 99
         stringValue = "Hello world!"
     }
-}
-
-struct CodableStructContainer {
-    @Persisted(encodedDataKey: UserDefaultsKey.withDefaultValue.rawValue, defaultValue: .init())
-    var withDefault: ExampleStuct
-
-    @Persisted(encodedDataKey: UserDefaultsKey.optional.rawValue)
-    var optional: ExampleStuct?
-}
-
-struct CodableIntegerContainer {
-    static let defaultValue = 123
-
-    @Persisted(encodedDataKey: UserDefaultsKey.withDefaultValue.rawValue, defaultValue: defaultValue)
-    var withDefault: Int
-
-    @Persisted(encodedDataKey: UserDefaultsKey.optional.rawValue)
-    var optional: Int?
 }
