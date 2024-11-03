@@ -23,14 +23,6 @@ struct ArchivedPropertyWrapperTests {
     }
 }
 
-fileprivate extension UserDefaults {
-    nonisolated(unsafe) static let testing: UserDefaults = {
-        let defaults = UserDefaults(suiteName: #file)!
-        defaults.removePersistentDomain(forName: #file)
-        return defaults
-    }()
-}
-
 final class ExampleArchivableObject: NSObject, NSSecureCoding, Sendable {
     static func == (lhs: ExampleArchivableObject, rhs: ExampleArchivableObject) -> Bool {
         return lhs.propertyOne == rhs.propertyOne && lhs.propertyTwo == rhs.propertyTwo

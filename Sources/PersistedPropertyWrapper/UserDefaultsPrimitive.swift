@@ -14,4 +14,4 @@ extension Float: UserDefaultsPrimitive {}
 extension Date: UserDefaultsPrimitive {}
 extension Data: UserDefaultsPrimitive {}
 extension Array: UserDefaultsPrimitive where Element: UserDefaultsPrimitive {}
-extension Dictionary: UserDefaultsPrimitive where Key: UserDefaultsPrimitive, Value: UserDefaultsPrimitive {}
+extension Dictionary: UserDefaultsPrimitive where Key == String, Value: UserDefaultsPrimitive {}

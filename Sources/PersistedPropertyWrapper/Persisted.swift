@@ -96,12 +96,44 @@ public extension Persisted {
         self.init(key: key, defaultValue: nil, valueConvertor: .init(), storage: storage)
     }
 
-    init(_ key: String, defaultValue: Exposed, storage: UserDefaults = .standard)  where Convertor == RawRepresentableStorageConvertor<NonOptionalExposed>, NonOptionalExposed: RawRepresentable, Exposed == NonOptionalExposed {
+    init(_ key: String, defaultValue: Exposed, storage: UserDefaults = .standard) where Convertor == RawRepresentableStorageConvertor<NonOptionalExposed>, NonOptionalExposed: RawRepresentable, Exposed == NonOptionalExposed {
         self.init(key: key, defaultValue: defaultValue, valueConvertor: RawRepresentableStorageConvertor(), storage: storage)
     }
 
     init(_ key: String, storage: UserDefaults = .standard) where Convertor == RawRepresentableStorageConvertor<NonOptionalExposed>, NonOptionalExposed: RawRepresentable, Exposed == NonOptionalExposed? {
         self.init(key: key, defaultValue: nil, valueConvertor: RawRepresentableStorageConvertor(), storage: storage)
+    }
+
+    init<ArrayElement>(_ key: String, storage: UserDefaults = .standard) where NonOptionalExposed == [ArrayElement], ArrayElement: RawRepresentable, Exposed == NonOptionalExposed?, Convertor == ArrayConvertor<RawRepresentableStorageConvertor<ArrayElement>> {
+        self.init(key: key, defaultValue: nil, valueConvertor: ArrayConvertor(elementConvertor: RawRepresentableStorageConvertor()), storage: storage)
+    }
+
+    init<ArrayElement>(_ key: String, defaultValue: Exposed, storage: UserDefaults = .standard) where NonOptionalExposed == [ArrayElement], ArrayElement: RawRepresentable, Exposed == NonOptionalExposed, Convertor == ArrayConvertor<RawRepresentableStorageConvertor<ArrayElement>> {
+        self.init(key: key, defaultValue: defaultValue, valueConvertor: ArrayConvertor(elementConvertor: RawRepresentableStorageConvertor()), storage: storage)
+    }
+
+    init<Key, Value>(_ key: String, storage: UserDefaults = .standard) where NonOptionalExposed == [Key: Value], Key: RawRepresentable, Value: UserDefaultsPrimitive, Exposed == NonOptionalExposed?, Convertor == DictionaryConvertor<RawRepresentableStorageConvertor<Key>, IdentityStorageConvertor<Value>> {
+        self.init(key: key, defaultValue: nil, valueConvertor: DictionaryConvertor(keyConvertor: RawRepresentableStorageConvertor(), valueConvertor: IdentityStorageConvertor()), storage: storage)
+    }
+
+    init<Key, Value>(_ key: String, defaultValue: Exposed, storage: UserDefaults = .standard) where NonOptionalExposed == [Key: Value], Key: RawRepresentable, Value: UserDefaultsPrimitive, Exposed == NonOptionalExposed, Convertor == DictionaryConvertor<RawRepresentableStorageConvertor<Key>, IdentityStorageConvertor<Value>> {
+        self.init(key: key, defaultValue: defaultValue, valueConvertor: DictionaryConvertor(keyConvertor: RawRepresentableStorageConvertor(), valueConvertor: IdentityStorageConvertor()), storage: storage)
+    }
+
+    init<Value>(_ key: String, storage: UserDefaults = .standard) where NonOptionalExposed == [String: Value], Value: RawRepresentable, Exposed == NonOptionalExposed?, Convertor == DictionaryConvertor<IdentityStorageConvertor<String>, RawRepresentableStorageConvertor<Value>> {
+        self.init(key: key, defaultValue: nil, valueConvertor: DictionaryConvertor(keyConvertor: IdentityStorageConvertor(), valueConvertor: RawRepresentableStorageConvertor()), storage: storage)
+    }
+
+    init<Value>(_ key: String, defaultValue: Exposed, storage: UserDefaults = .standard) where NonOptionalExposed == [String: Value], Value: RawRepresentable, Exposed == NonOptionalExposed, Convertor == DictionaryConvertor<IdentityStorageConvertor<String>, RawRepresentableStorageConvertor<Value>> {
+        self.init(key: key, defaultValue: defaultValue, valueConvertor: DictionaryConvertor(keyConvertor: IdentityStorageConvertor(), valueConvertor: RawRepresentableStorageConvertor()), storage: storage)
+    }
+
+    init<Key, Value>(_ key: String, storage: UserDefaults = .standard) where NonOptionalExposed == [Key: Value], Key: RawRepresentable, Value: RawRepresentable, Exposed == NonOptionalExposed?, Convertor == DictionaryConvertor<RawRepresentableStorageConvertor<Key>, RawRepresentableStorageConvertor<Value>> {
+        self.init(key: key, defaultValue: nil, valueConvertor: DictionaryConvertor(keyConvertor: RawRepresentableStorageConvertor(), valueConvertor: RawRepresentableStorageConvertor()), storage: storage)
+    }
+
+    init<Key, Value>(_ key: String, defaultValue: Exposed, storage: UserDefaults = .standard) where NonOptionalExposed == [Key: Value], Key: RawRepresentable, Value: RawRepresentable, Exposed == NonOptionalExposed, Convertor == DictionaryConvertor<RawRepresentableStorageConvertor<Key>, RawRepresentableStorageConvertor<Value>> {
+        self.init(key: key, defaultValue: defaultValue, valueConvertor: DictionaryConvertor(keyConvertor: RawRepresentableStorageConvertor(), valueConvertor: RawRepresentableStorageConvertor()), storage: storage)
     }
 
     // Note the different parameter name in the following: encodedDataKey vs unnamed. This is reqired since some Codable types

@@ -47,14 +47,6 @@ struct EnumPropertyWrapperTests {
     }
 }
 
-fileprivate extension UserDefaults {
-    nonisolated(unsafe) static let testing: UserDefaults = {
-        let defaults = UserDefaults(suiteName: #file)!
-        defaults.removePersistentDomain(forName: #file)
-        return defaults
-    }()
-}
-
 enum IntegerEnumeration: Int, CaseIterable {
     case zero
     case one

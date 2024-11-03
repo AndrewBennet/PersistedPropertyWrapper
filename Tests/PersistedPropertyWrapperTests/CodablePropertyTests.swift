@@ -52,14 +52,6 @@ struct CodablePropertyWrapperTests {
     }
 }
 
-fileprivate extension UserDefaults {
-    nonisolated(unsafe) static let testing: UserDefaults = {
-        let defaults = UserDefaults(suiteName: #file)!
-        defaults.removePersistentDomain(forName: #file)
-        return defaults
-    }()
-}
-
 struct ExampleStuct: Codable, Equatable {
     enum ExampleEnum: String, Codable {
         case case1

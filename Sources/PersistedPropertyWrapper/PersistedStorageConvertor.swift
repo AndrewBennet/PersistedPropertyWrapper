@@ -31,6 +31,46 @@ public struct RawRepresentableStorageConvertor<Exposed>: PersistedStorageConvert
     }
 }
 
+/// Maps between two forms of an `Array`, where the values are convertable via another `PersistedStorageConvertor`.
+public struct ArrayConvertor<ElementConvertor: PersistedStorageConvertor>: PersistedStorageConvertor {
+    let elementConvertor: ElementConvertor
+
+    public func convertToExposedType(_ persistedValue: [ElementConvertor.Persisted]) -> [ElementConvertor.Exposed]? {
+        return persistedValue.compactMap(elementConvertor.convertToExposedType)
+    }
+
+    public func convertToPersistentStorage(_ exposedValue: [ElementConvertor.Exposed]) -> [ElementConvertor.Persisted] {
+        return exposedValue.map(elementConvertor.convertToPersistentStorage)
+    }
+}
+
+/// Maps between two forms of a `Dictionary`, where the keys and values are convertable via other `PersistedStorageConvertor`s.
+public struct DictionaryConvertor<KeyConvertor: PersistedStorageConvertor, ValueConvertor: PersistedStorageConvertor>: PersistedStorageConvertor
+    where KeyConvertor.Exposed: Hashable, KeyConvertor.Persisted == String {
+
+    public typealias Persisted = Dictionary<KeyConvertor.Persisted, ValueConvertor.Persisted>
+    public typealias Exposed = Dictionary<KeyConvertor.Exposed, ValueConvertor.Exposed>
+
+    let keyConvertor: KeyConvertor
+    let valueConvertor: ValueConvertor
+
+    public func convertToExposedType(_ persistedValue: Persisted) -> Exposed? {
+        return Dictionary(uniqueKeysWithValues: persistedValue.compactMap {
+            guard let exposedKey = keyConvertor.convertToExposedType($0.key),
+                  let exposedValue = valueConvertor.convertToExposedType($0.value) else { return nil }
+            return (exposedKey, exposedValue)
+        })
+    }
+
+    public func convertToPersistentStorage(_ exposedValue: Exposed) -> Persisted {
+        return Dictionary(uniqueKeysWithValues: exposedValue.compactMap {
+            let persistedKey = keyConvertor.convertToPersistentStorage($0.key)
+            let persistedValue = valueConvertor.convertToPersistentStorage($0.value)
+            return (persistedKey, persistedValue)
+        })
+    }
+}
+
 /// Maps between any `Codable` value and `Data`
 public struct CodableStorageConvertor<Exposed>: PersistedStorageConvertor where Exposed: Codable {
     private let jsonEncoder = JSONEncoder()
