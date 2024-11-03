@@ -52,6 +52,11 @@ public struct PersistedState<Exposed, NonOptionalExposed, Convertor>: DynamicPro
             set: { wrappedValue = $0 }
         )
     }
+
+    /// A publisher that emits when the value of the `PersistedState` is about to change (the underlying UserDefaults storage may have already been updated).
+    public var valueChanged: AnyPublisher<Void, Never> {
+        persistedObserver.objectWillChange.eraseToAnyPublisher()
+    }
 }
 
 // MARK: Initialisers
