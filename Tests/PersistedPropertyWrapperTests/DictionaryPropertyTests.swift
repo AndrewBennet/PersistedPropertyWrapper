@@ -8,7 +8,7 @@ struct DictionaryPropertyTests {
     var rawKeyAndValueWithDefault: [StringEnumeration: IntegerEnumeration]
 
     @Persisted(UUID().uuidString, storage: .testing)
-    var rawKeyAndValueOptional: [StringEnumeration: IntegerEnumeration]?
+    var rawKeyAndValueOptional: [IntegerEnumeration: StringEnumeration]?
 
     @Test
     func testEnumStringStorage() {
@@ -21,8 +21,8 @@ struct DictionaryPropertyTests {
         rawKeyAndValueOptional = [:]
         #expect(rawKeyAndValueOptional == [:])
 
-        rawKeyAndValueOptional?[.hello] = .zero
-        #expect(rawKeyAndValueOptional == [.hello: .zero])
+        rawKeyAndValueOptional?[.zero] = .hello
+        #expect(rawKeyAndValueOptional == [.zero: .hello])
 
         rawKeyAndValueOptional = nil
         #expect(rawKeyAndValueOptional == nil)

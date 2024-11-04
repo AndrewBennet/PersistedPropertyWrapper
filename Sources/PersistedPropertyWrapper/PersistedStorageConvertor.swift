@@ -18,6 +18,8 @@ public struct IdentityStorageConvertor<Exposed>: PersistedStorageConvertor where
     public func convertToPersistentStorage(_ exposedValue: Exposed) -> Exposed {
         return exposedValue
     }
+
+    static var convertor: Self { .init() }
 }
 
 /// Maps between `RawRepresentable` values and their underlying `RawValues`
@@ -29,19 +31,41 @@ public struct RawRepresentableStorageConvertor<Exposed>: PersistedStorageConvert
     public func convertToPersistentStorage(_ exposedValue: Exposed) -> Exposed.RawValue {
         return exposedValue.rawValue
     }
+
+    static var convertor: Self { .init() }
 }
 
-/// Maps between two forms of an `Array`, where the values are convertable via another `PersistedStorageConvertor`.
-public struct ArrayConvertor<ElementConvertor: PersistedStorageConvertor>: PersistedStorageConvertor {
+/// Maps between a `Collection` of an exposed type and an `Array` of a persisted type, via another `PersistedStorageConvertor` applies to the elemnts.
+public struct CollectionConvertor<Exposed: Collection, ElementConvertor: PersistedStorageConvertor>: PersistedStorageConvertor where Exposed.Element == ElementConvertor.Exposed {
     let elementConvertor: ElementConvertor
+    let collectionInitialiser: @Sendable ([ElementConvertor.Exposed]) -> Exposed
 
-    public func convertToExposedType(_ persistedValue: [ElementConvertor.Persisted]) -> [ElementConvertor.Exposed]? {
-        return persistedValue.compactMap(elementConvertor.convertToExposedType)
+    public func convertToExposedType(_ persistedValue: [ElementConvertor.Persisted]) -> Exposed? {
+        return collectionInitialiser(persistedValue.compactMap(elementConvertor.convertToExposedType))
     }
 
-    public func convertToPersistentStorage(_ exposedValue: [ElementConvertor.Exposed]) -> [ElementConvertor.Persisted] {
+    public func convertToPersistentStorage(_ exposedValue: Exposed) -> [ElementConvertor.Persisted] {
         return exposedValue.map(elementConvertor.convertToPersistentStorage)
     }
+}
+
+extension CollectionConvertor where Exposed == Array<ElementConvertor.Exposed> {
+    init(elementConvertor: ElementConvertor) {
+        self.init(elementConvertor: elementConvertor, collectionInitialiser: { $0 })
+    }
+}
+
+/// Maps between some `Exposed` type and a `String` via a lossless string conversion.
+public struct StringConvertor<Exposed>: PersistedStorageConvertor where Exposed: LosslessStringConvertible {
+    public func convertToExposedType(_ persistedValue: String) -> Exposed? {
+        return Exposed(persistedValue)
+    }
+
+    public func convertToPersistentStorage(_ exposedValue: Exposed) -> String {
+        return exposedValue.description
+    }
+
+    static var convertor: Self { .init() }
 }
 
 /// Maps between two forms of a `Dictionary`, where the keys and values are convertable via other `PersistedStorageConvertor`s.
@@ -83,6 +107,8 @@ public struct CodableStorageConvertor<Exposed>: PersistedStorageConvertor where 
     public func convertToPersistentStorage(_ exposedValue: Exposed) -> Data {
         return try! jsonEncoder.encode(exposedValue)
     }
+
+    static var convertor: Self { .init() }
 }
 
 /// Maps between any `NSSecureCoding` conformant `NSObject` instance and `Data`
@@ -94,4 +120,6 @@ public struct ArchivedDataStorageConvertor<Exposed>: PersistedStorageConvertor w
     public func convertToPersistentStorage(_ exposedValue: Exposed) -> Data {
         return try! NSKeyedArchiver.archivedData(withRootObject: exposedValue, requiringSecureCoding: true)
     }
+
+    static var convertor: Self { .init() }
 }
