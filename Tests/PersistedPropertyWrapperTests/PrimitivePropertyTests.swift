@@ -44,14 +44,6 @@ struct PrimitivePropertyWrapperTests {
         runPrimitiveStorageTest(Date.self) { $0.addTimeInterval(100000) }
     }
 
-    @Test func testStringArrayStorage() {
-        runPrimitiveStorageTest([String].self) { $0.append("!!!") }
-    }
-
-    @Test func testDictionaryStorage() {
-        runPrimitiveStorageTest([String: Int].self) { $0["XYZ"] = 123 }
-    }
-
     private func runPrimitiveStorageTest<T>(_ type: T.Type, operation: (inout T) -> Void) where T: TestablePrimitive, T: Equatable {
         let container = PersistedPrimitivePropertyContainer<T>()
         #expect(T.defaultValue == container.withDefault)
@@ -70,56 +62,72 @@ struct PrimitivePropertyWrapperTests {
     }
 }
 
-protocol TestablePrimitive: UserDefaultsPrimitive, Sendable {
+protocol TestablePrimitive: UserDefaultsScalar, Sendable {
     static var defaultValue: Self { get }
 }
 
 extension Int: TestablePrimitive {
-    static var defaultValue: Int { 42 }
+    static var defaultValue: Self { 42 }
+}
+
+extension Int8: TestablePrimitive {
+    static var defaultValue: Self { 42 }
 }
 
 extension Int16: TestablePrimitive {
-    static var defaultValue: Int16 { 42 }
+    static var defaultValue: Self { 42 }
 }
 
 extension Int32: TestablePrimitive {
-    static var defaultValue: Int32 { 42 }
+    static var defaultValue: Self { 42 }
 }
 
 extension Int64: TestablePrimitive {
-    static var defaultValue: Int64 { 42 }
+    static var defaultValue: Self { 42 }
+}
+
+extension UInt: TestablePrimitive {
+    static var defaultValue: Self { 42 }
+}
+
+extension UInt8: TestablePrimitive {
+    static var defaultValue: Self { 42 }
+}
+
+extension UInt16: TestablePrimitive {
+    static var defaultValue: Self { 42 }
+}
+
+extension UInt32: TestablePrimitive {
+    static var defaultValue: Self { 42 }
+}
+
+extension UInt64: TestablePrimitive {
+    static var defaultValue: Self { 42 }
 }
 
 extension String: TestablePrimitive {
-    static var defaultValue: String { "Hello" }
+    static var defaultValue: Self { "Hello" }
 }
 
 extension Bool: TestablePrimitive {
-    static var defaultValue: Bool { true }
+    static var defaultValue: Self { true }
 }
 
 extension Data: TestablePrimitive {
-    static var defaultValue: Data { "Hello".data(using: .utf8)! }
+    static var defaultValue: Self { "Hello".data(using: .utf8)! }
 }
 
 extension Float: TestablePrimitive {
-    static var defaultValue: Float { 99.9 }
+    static var defaultValue: Self { 99.9 }
 }
 
 extension Double: TestablePrimitive {
-    static var defaultValue: Double { 101.1 }
+    static var defaultValue: Self { 101.1 }
 }
 
 extension Date: TestablePrimitive {
-    static var defaultValue: Date { Date(timeIntervalSince1970: 1593197020) }
-}
-
-extension Array: TestablePrimitive where Element == String {
-    static var defaultValue: [String] { ["Hello", "World"] }
-}
-
-extension [String: Int]: TestablePrimitive {
-    static var defaultValue: [String: Int] { ["Hello": 1, "World": 2] }
+    static var defaultValue: Self { Date(timeIntervalSince1970: 1593197020) }
 }
 
 struct PersistedPrimitivePropertyContainer<T> where T: TestablePrimitive {

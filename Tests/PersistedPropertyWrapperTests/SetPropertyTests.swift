@@ -26,8 +26,6 @@ struct SetPropertyTests {
 
         optionalSet = nil
         #expect(optionalSet == nil)
-
-        let x = foo.far as! any LosslessStringConvertible
     }
 
     @Test
@@ -40,8 +38,4 @@ struct SetPropertyTests {
         rawRepresentabelSet = []
         #expect(rawRepresentabelSet == [])
     }
-}
-
-enum foo: Int {
-    case far = 1
 }

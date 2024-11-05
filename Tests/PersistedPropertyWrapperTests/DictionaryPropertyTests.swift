@@ -10,6 +10,9 @@ struct DictionaryPropertyTests {
     @Persisted(UUID().uuidString, storage: .testing)
     var rawKeyAndValueOptional: [IntegerEnumeration: StringEnumeration]?
 
+    @Persisted(UUID().uuidString, storage: .testing)
+    var complexType: [UInt8: [String: Set<Float>]]?
+
     @Test
     func testEnumStringStorage() {
         #expect(rawKeyAndValueWithDefault == [.hello: .zero, .world: .one])
@@ -26,5 +29,12 @@ struct DictionaryPropertyTests {
 
         rawKeyAndValueOptional = nil
         #expect(rawKeyAndValueOptional == nil)
+
+        let complexTypeValue: [UInt8: [String: Set<Float>]] = [
+            1: ["hello": [1.0, 2.0]],
+            2: ["world": [3.0, 4.0]]
+        ]
+        complexType = complexTypeValue
+        #expect(complexType == complexTypeValue)
     }
 }
