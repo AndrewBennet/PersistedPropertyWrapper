@@ -19,19 +19,17 @@ public struct PersistedState<Exposed: Sendable, NonOptionalExposed: Sendable, Co
 
     // Initialiser is private so that we can selectively expose the overloads with/without default value parameter
     // depending on whether the exposed type is Optional.
-    init(key: String, defaultValue: Exposed, storage: UserDefaults) {
+    private init(key: String, defaultValue: Exposed, storage: UserDefaults) {
+        self.init(PersistedObserver(persistedStorage: Persisted(key: key, defaultValue: defaultValue, storage: storage)))
+    }
+
+    private init(_ observer: @escaping @autoclosure () -> PersistedObserver<Exposed, NonOptionalExposed, Convertor>) {
         // We cannot check this condition at compile time. We only publicly expose valid initialisation
         // functions, but to be safe let's check at runtime that the types are correct.
         guard Exposed.self == Convertor.Input.self || Exposed.self == Optional<Convertor.Input>.self else {
             preconditionFailure("Invalid Persisted generic arguments")
         }
-        // StateObject's initialiser taken an @autoclosure, so we'll only construct the PersistedObserver once, the first
-        // time this constructor is called.
-        self._persistedObserver = StateObject(wrappedValue: PersistedObserver<Exposed, NonOptionalExposed, Convertor>(
-            key: key,
-            defaultValue: defaultValue,
-            storage: storage
-        ))
+        self._persistedObserver = StateObject(wrappedValue: observer())
     }
 
     /// Getting this property will lookup the value from UserDefaults; setting will write the value to UserDefaults.
@@ -54,7 +52,7 @@ public struct PersistedState<Exposed: Sendable, NonOptionalExposed: Sendable, Co
 
     /// A publisher that emits changes to the value of the `PersistedState`.
     public var valueChanged: AnyPublisher<Exposed, Never> {
-        persistedObserver.$value.eraseToAnyPublisher()
+        persistedObserver.valueChanged
     }
 }
 
@@ -83,7 +81,7 @@ public extension PersistedState {
      in order to automatically use the same `UserDefaults` store and key for the `@PersistedState`.
      */
     init(_ persistedValue: Persisted<Exposed, NonOptionalExposed, Convertor>) {
-        self.init(key: persistedValue.key, defaultValue: persistedValue.defaultValue, storage: persistedValue.storage)
+        self.init(PersistedObserver(persistedStorage: persistedValue))
     }
 
     // Simple

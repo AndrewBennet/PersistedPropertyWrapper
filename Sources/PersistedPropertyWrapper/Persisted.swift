@@ -1,4 +1,5 @@
 import Foundation
+import Combine
 import os.log
 
 /// A property wrapper that reads from and writes to a UserDefaults store.
@@ -69,6 +70,11 @@ public struct Persisted<Exposed: Sendable, NonOptionalExposed: Sendable, Convert
 
     /** The raw `Persisted` that backs this property wrapper. */
     public var projectedValue: Self { self }
+
+    /// Returns a publisher that emits when the value changes (even if changed externally).
+    public func publisher() -> AnyPublisher<Exposed, Never> {
+        PersistedObserver(persistedStorage: self).valueChanged
+    }
 }
 
 // Enables a value of a generic type to be compared with nil, by first checking whether it conforms to this protocol.
