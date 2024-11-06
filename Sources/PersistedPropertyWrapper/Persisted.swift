@@ -23,6 +23,7 @@ public struct Persisted<Exposed: Sendable, NonOptionalExposed: Sendable, Convert
     nonisolated(unsafe) let storage: UserDefaults
 
     init(key: String, defaultValue: Exposed, storage: UserDefaults) {
+        print("init")
         // We cannot check this condition at compile time. We only publicly expose valid initialisation
         // functions, but to be safe let's check at runtime that the types are correct.
         guard Exposed.self == Convertor.Input.self || Exposed.self == Optional<Convertor.Input>.self else {
@@ -73,7 +74,7 @@ public struct Persisted<Exposed: Sendable, NonOptionalExposed: Sendable, Convert
 
     /// Returns a publisher that emits when the value changes (even if changed externally).
     public func publisher() -> AnyPublisher<Exposed, Never> {
-        PersistedObserver(persistedStorage: self).valueChanged
+        PersistedObserver(persistedStorage: self).eraseToAnyPublisher()
     }
 }
 

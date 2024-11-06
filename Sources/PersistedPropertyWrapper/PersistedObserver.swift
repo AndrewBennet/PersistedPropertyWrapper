@@ -2,11 +2,16 @@ import Foundation
 import Combine
 import os.log
 
-/// An object that, upon initialisation, adds itself as an observer of the provided `UserDefaults` for the given `key`, and updates its
-/// `@Published` `propertyValue` property
-class PersistedObserver<Exposed: Sendable, NonOptionalExposed: Sendable, Convertor: Sendable>: NSObject, ObservableObject
-    where Exposed: Sendable, Convertor: StorageConvertor, Convertor.Input == NonOptionalExposed {
+/// A `Publisher` of the converted value stored in `UserDefaults` (publishes even with external changes).
+/// Conforms to `ObservableObject` and triggers `objectWillChange` when the `UserDefaults` store changes for the specified key.
+class PersistedObserver<Exposed: Sendable, NonOptionalExposed: Sendable, Convertor: StorageConvertor>: NSObject, Publisher, ObservableObject
+    where Convertor.Input == NonOptionalExposed {
+
+    typealias Output = Exposed
+    typealias Failure = Never
+
     let persistedStorage: Persisted<Exposed, NonOptionalExposed, Convertor>
+    private let currentValueSubject: CurrentValueSubject<Exposed, Never>
 
     init(persistedStorage: Persisted<Exposed, NonOptionalExposed, Convertor>) {
         // We cannot check this condition at compile time. We only publicly expose valid initialisation
@@ -15,8 +20,7 @@ class PersistedObserver<Exposed: Sendable, NonOptionalExposed: Sendable, Convert
             preconditionFailure("Invalid Persisted generic arguments")
         }
         self.persistedStorage = persistedStorage
-        self.value = persistedStorage.wrappedValue
-
+        self.currentValueSubject = CurrentValueSubject(persistedStorage.wrappedValue)
         super.init()
         persistedStorage.storage.addObserver(self, forKeyPath: persistedStorage.key, context: nil)
     }
@@ -25,18 +29,12 @@ class PersistedObserver<Exposed: Sendable, NonOptionalExposed: Sendable, Convert
         persistedStorage.storage.removeObserver(self, forKeyPath: persistedStorage.key)
     }
 
-    public override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey: Any]?, context: UnsafeMutableRawPointer?) {
-        value = persistedStorage.wrappedValue
+    override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey: Any]?, context: UnsafeMutableRawPointer?) {
+        objectWillChange.send()
+        currentValueSubject.send(persistedStorage.wrappedValue)
     }
 
-    @Published var value: Exposed {
-        didSet {
-            persistedStorage.wrappedValue = value
-        }
-    }
-
-    /// A publisher that emits changes to the persisted value.
-    var valueChanged: AnyPublisher<Exposed, Never> {
-        $value.eraseToAnyPublisher()
+    func receive<S>(subscriber: S) where S : Subscriber, Never == S.Failure, Exposed == S.Input {
+        currentValueSubject.receive(subscriber: subscriber)
     }
 }

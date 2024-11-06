@@ -13,8 +13,7 @@ import os.log
 public struct PersistedState<Exposed: Sendable, NonOptionalExposed: Sendable, Convertor>: DynamicProperty
     where Convertor: StorageConvertor, Convertor.Input == NonOptionalExposed, Exposed: Sendable {
 
-    /// An object that exposes the persisted value in a `@Published` property, and observes the `UserDefaults` for changes, auto-updating
-    /// the property when these occur externally.
+    /// An object that watches `UserDefaults` for changes and publishes its values.
     @StateObject private var persistedObserver: PersistedObserver<Exposed, NonOptionalExposed, Convertor>
 
     // Initialiser is private so that we can selectively expose the overloads with/without default value parameter
@@ -35,10 +34,10 @@ public struct PersistedState<Exposed: Sendable, NonOptionalExposed: Sendable, Co
     /// Getting this property will lookup the value from UserDefaults; setting will write the value to UserDefaults.
     public var wrappedValue: Exposed {
         get {
-            return persistedObserver.value
+            return persistedObserver.persistedStorage.wrappedValue
         }
         nonmutating set {
-            persistedObserver.value = newValue
+            persistedObserver.persistedStorage.wrappedValue = newValue
         }
     }
 
@@ -52,7 +51,7 @@ public struct PersistedState<Exposed: Sendable, NonOptionalExposed: Sendable, Co
 
     /// A publisher that emits changes to the value of the `PersistedState`.
     public var valueChanged: AnyPublisher<Exposed, Never> {
-        persistedObserver.valueChanged
+        persistedObserver.eraseToAnyPublisher()
     }
 }
 

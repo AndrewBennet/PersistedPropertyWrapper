@@ -62,7 +62,7 @@ struct PrimitivePropertyWrapperTests {
     }
 }
 
-protocol TestablePrimitive: UserDefaultsScalar, Sendable {
+protocol TestablePrimitive: UserDefaultsPrimitive & UserDefaultsStorable, Sendable {
     static var defaultValue: Self { get }
 }
 

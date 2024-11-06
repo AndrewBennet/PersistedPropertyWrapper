@@ -22,7 +22,7 @@ public struct IdentityConvertor<Input>: StorageConvertor where Input: UserDefaul
 }
 
 /// Maps between `RawRepresentable` values and their underlying `RawValues`, where the raw value is a natively-storable value.
-public struct RawRepresentableConvertor<Input>: StorageConvertor where Input: RawRepresentable, Input.RawValue: UserDefaultsScalar {
+public struct RawRepresentableConvertor<Input>: StorageConvertor where Input: RawRepresentable, Input.RawValue: UserDefaultsPrimitive {
     public static func convert(_ input: Input) -> Input.RawValue {
         return input.rawValue
     }
@@ -105,7 +105,6 @@ public struct DictionaryConvertor<KeyConvertor: StorageConvertor, ValueConvertor
 
 /// Maps between any `Codable` value and `Data`.
 public struct CodableStorageConvertor<Input>: StorageConvertor where Input: Codable {
-
     public static func convert(_ input: Input) -> Data {
         return try! JSONEncoder().encode(input)
     }
