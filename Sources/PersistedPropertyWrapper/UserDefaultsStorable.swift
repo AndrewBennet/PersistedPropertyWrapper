@@ -4,7 +4,7 @@ import Foundation
 public protocol UserDefaultsStorable {
     associatedtype Stored: UserDefaultsPrimitive
 
-    init(storedValue: Stored)
+    init?(storedValue: Stored)
     var storedValue: Stored { get }
 }
 
@@ -39,7 +39,7 @@ extension Data: UserDefaultsStorable {}
 /// We can store any array of a convertable type in UserDefaults.
 extension Array: UserDefaultsStorable where Element: UserDefaultsStorable {
     public init(storedValue: Array<Element.Stored>) {
-        self = storedValue.map(Element.init(storedValue:))
+        self = storedValue.compactMap(Element.init(storedValue:))
     }
 
     public var storedValue: Array<Element.Stored> {
@@ -51,8 +51,8 @@ extension Array: UserDefaultsStorable where Element: UserDefaultsStorable {
 extension Dictionary: UserDefaultsStorable where Key: LosslessStringConvertible, Value: UserDefaultsStorable {
     public init(storedValue: Dictionary<String, Value.Stored>) {
         self = .init(uniqueKeysWithValues: storedValue.compactMap { (key, value) in
-            guard let mappedKey = Key(key) else { return nil }
-            return (mappedKey, Value(storedValue: value))
+            guard let mappedKey = Key(key), let mappedValue = Value(storedValue: value) else { return nil }
+            return (mappedKey, mappedValue)
         })
     }
 
@@ -64,7 +64,7 @@ extension Dictionary: UserDefaultsStorable where Key: LosslessStringConvertible,
 /// Sets can be represented as arrays in UserDefaults, where the element type can be stored.
 extension Set: UserDefaultsStorable where Element: UserDefaultsStorable {
     public init(storedValue: [Element.Stored]) {
-        self = Set(storedValue.map(Element.init(storedValue:)))
+        self = Set(storedValue.compactMap(Element.init(storedValue:)))
     }
 
     public var storedValue: [Element.Stored] {
