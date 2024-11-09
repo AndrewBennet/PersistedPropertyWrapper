@@ -74,7 +74,11 @@ public struct Persisted<Exposed: Sendable, NonOptionalExposed: Sendable, Convert
 
     /// Returns a publisher that emits when the value changes (even if changed externally).
     public func publisher() -> AnyPublisher<Exposed, Never> {
-        PersistedObserver(persistedStorage: self).eraseToAnyPublisher()
+        // Share prevents callers from having to keep a strong reference to the publisher as well as the subscription
+        // cancellation token. Without this, it's very easy to call:
+        //    cancellable = Persisted.$value.publisher().sink { _ in /* handle change */}
+        // and not realise that the publisher is quickly deallocated.
+        PersistedObserver(persistedStorage: self).share().eraseToAnyPublisher()
     }
 }
 
