@@ -6,8 +6,8 @@ import os.log
 /// A property wrapper that reads from and writes to a UserDefaults store, and also monitors the `UserDefaults` for external changes, and triggers SwiftUI
 /// view updates when any change occurs. Supports properties of the following types: those which can be natively stored in `UserDefaults`,
 /// `RawRepresentable` types where the `RawType` is one which an be natively stored in `UserDefaults`, and any `Codable` type.
-/// If you wish to use a persisted value in code outside of SwiftUI, or in code not on the Main Actor, use `@Persisted` instead, which is a simpler
-/// and more lightweight wrapper around `UserDefaults`.
+/// If you wish to use a persisted value in code outside of SwiftUI, or in code not on the Main Actor, or in an `ObservableObject`, use `@Persisted` instead,
+/// which is a simpler and more lightweight wrapper around `UserDefaults`.
 @MainActor
 @propertyWrapper
 public struct PersistedState<Exposed: Sendable, NonOptionalExposed: Sendable, Convertor>: DynamicProperty
