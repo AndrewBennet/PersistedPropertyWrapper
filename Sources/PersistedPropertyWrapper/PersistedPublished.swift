@@ -1,66 +1,70 @@
 import Foundation
 import Combine
-import SwiftUI
 import os.log
 
-/// A property wrapper that reads from and writes to a UserDefaults store, and also monitors the `UserDefaults` for external changes, and triggers SwiftUI
-/// view updates when any change occurs. Supports properties of the following types: those which can be natively stored in `UserDefaults`,
+/// A property wrapper that reads from and writes to a UserDefaults store, for use in an `ObservableObject`.
+/// Supports properties of the following types: those which can be natively stored in `UserDefaults`,
 /// `RawRepresentable` types where the `RawType` is one which an be natively stored in `UserDefaults`, and any `Codable` type.
-/// If you wish to use a persisted value in code outside of SwiftUI, or in code not on the Main Actor, use `@Persisted` instead,
-/// which is a simpler and more lightweight wrapper around `UserDefaults`.
-@MainActor
 @propertyWrapper
-public struct PersistedState<Exposed: Sendable, NonOptionalExposed: Sendable, Convertor>: DynamicProperty
-    where Convertor: StorageConvertor, Convertor.Input == NonOptionalExposed, Exposed: Sendable {
+public struct PersistedPublished<Exposed: Sendable, NonOptionalExposed: Sendable, Convertor: StorageConvertor<NonOptionalExposed>> {
 
-    /// An object that watches `UserDefaults` for changes and publishes its values.
-    @StateObject private var persistedObserver: PersistedObserver<Exposed, NonOptionalExposed, Convertor>
+    // The regular @Persisted property wrapper, which we use to do the value conversion & storage for us.
+    private let persisted: Persisted<Exposed, NonOptionalExposed, Convertor>
+    private let subscriptionContainer = SubscriptionContainer()
 
-    // Initialiser is private so that we can selectively expose the overloads with/without default value parameter
-    // depending on whether the exposed type is Optional.
-    private init(key: String, defaultValue: Exposed, storage: UserDefaults) {
-        self.init(PersistedObserver(persistedStorage: Persisted(key: key, defaultValue: defaultValue, storage: storage)))
+    class SubscriptionContainer {
+        var subscription: AnyCancellable?
     }
 
-    private init(_ observer: @escaping @autoclosure () -> PersistedObserver<Exposed, NonOptionalExposed, Convertor>) {
-        // We cannot check this condition at compile time. We only publicly expose valid initialisation
-        // functions, but to be safe let's check at runtime that the types are correct.
-        guard Exposed.self == Convertor.Input.self || Exposed.self == Optional<Convertor.Input>.self else {
-            preconditionFailure("Invalid Persisted generic arguments")
-        }
-        self._persistedObserver = StateObject(wrappedValue: observer())
+    init(key: String, defaultValue: Exposed, storage: UserDefaults) {
+        self.init(persisted: Persisted(key: key, defaultValue: defaultValue, storage: storage))
     }
 
-    /// Getting this property will lookup the value from UserDefaults; setting will write the value to UserDefaults.
+    init(persisted: Persisted<Exposed, NonOptionalExposed, Convertor>) {
+        self.persisted = persisted
+    }
+
+    @available(*, unavailable, message: "@PersistedPublished can only be applied to classes")
     public var wrappedValue: Exposed {
+        get { fatalError() }
+        set { fatalError() }
+    }
+
+    // A magical undocumented feature of SwiftUI / Combine. This static function is an alternative way of handling a property
+    // wrapper's value. In this case, we define this function to allow @Persisted properties to notify containing ObservableObjects
+    // of changes when the value is set. We do not monitor for changes, though.
+    public static subscript<T: ObservableObject>(
+        _enclosingInstance instance: T,
+        wrapped wrappedKeyPath: ReferenceWritableKeyPath<T, Exposed>,
+        storage storageKeyPath: ReferenceWritableKeyPath<T, Self>
+    ) -> Exposed {
         get {
-            return persistedObserver.persistedStorage.wrappedValue
+            let storage = instance[keyPath: storageKeyPath]
+            // Set up a subscription the first time the property is accessed via this mechanism.
+            if storage.subscriptionContainer.subscription == nil {
+                storage.subscriptionContainer.subscription = storage.persisted.publisher().sink { newValue in
+                    if let observableObjectPubisher = instance.objectWillChange as? ObservableObjectPublisher {
+                        observableObjectPubisher.send()
+                    } else {
+                        assertionFailure("ObservableObject's objectWillChange publisher is not an ObservableObjectPublisher")
+                    }
+                }
+            }
+            return storage.persisted.wrappedValue
         }
-        nonmutating set {
-            persistedObserver.persistedStorage.wrappedValue = newValue
+        set {
+            instance[keyPath: storageKeyPath].persisted.wrappedValue = newValue
         }
-    }
-
-    /// Returns a binding to the persisted value.
-    public var projectedValue: Binding<Exposed> {
-        Binding<Exposed>(
-            get: { wrappedValue },
-            set: { wrappedValue = $0 }
-        )
-    }
-
-    /// A publisher that emits changes to the value of the `PersistedState`.
-    public var valueChanged: AnyPublisher<Exposed, Never> {
-        persistedObserver.eraseToAnyPublisher()
     }
 }
 
 // MARK: Initialisers
 
-public extension PersistedState {
+public extension PersistedPublished {
+
     /**
-     Use this initialiser to initialise a `PersistedState` from a `@Persisted`'s projected value.
-     
+     Use this initialiser to initialise a `PersistedPublished` from a `@Persisted`'s projected value.
+
      For instance, given a `@Persisted` value:
 ```
      struct Settings {
@@ -70,17 +74,17 @@ public extension PersistedState {
        var mySetting: Int
      }
 ```
-     then reference the `@Persisted` value in the initialiser of a `@PersistedState` for use in a SwiftUI view:
+     then reference the `@Persisted` value in the initialiser of a `@PersistedState` for use in an observable object:
 
 ```
-     @PersistedState(Settings.instance.$mySetting)
+     @PersistedPublished(Settings.instance.$mySetting)
      var mySetting: Int
 ```
 
      in order to automatically use the same `UserDefaults` store and key for the `@PersistedState`.
      */
     init(_ persistedValue: Persisted<Exposed, NonOptionalExposed, Convertor>) {
-        self.init(PersistedObserver(persistedStorage: persistedValue))
+        self.init(persisted: persistedValue)
     }
 
     // Simple
