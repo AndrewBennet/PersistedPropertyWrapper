@@ -79,30 +79,6 @@ public struct Persisted<Exposed: Sendable, NonOptionalExposed: Sendable, Convert
         // and not realise that the publisher is quickly deallocated.
         PersistedObserver(persistedStorage: self).share().eraseToAnyPublisher()
     }
-
-    // A magical undocumented feature of SwiftUI / Combine. This static function is an alternative way of handling a property
-    // wrapper's value. In this case, we define this function to allow @Persisted properties to notify containing ObservableObjects
-    // of changes when the value is set. We do not monitor for changes, though.
-    public static subscript<T: ObservableObject>(
-        _enclosingInstance instance: T,
-        wrapped wrappedKeyPath: ReferenceWritableKeyPath<T, Exposed>,
-        storage storageKeyPath: ReferenceWritableKeyPath<T, Self>
-    ) -> Exposed {
-        get {
-            instance[keyPath: storageKeyPath].wrappedValue
-        }
-        set {
-            // Send the change notification to the enclosing object's change publisher.
-            if let observableObjectPubisher = instance.objectWillChange as? ObservableObjectPublisher {
-                observableObjectPubisher.send()
-            } else {
-                assertionFailure("ObservableObject's objectWillChange publisher is not an ObservableObjectPublisher")
-            }
-
-            // And then update the underlying value.
-            instance[keyPath: storageKeyPath].wrappedValue = newValue
-        }
-    }
 }
 
 // Enables a value of a generic type to be compared with nil, by first checking whether it conforms to this protocol.
