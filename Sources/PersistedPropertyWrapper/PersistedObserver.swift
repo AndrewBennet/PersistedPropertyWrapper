@@ -11,7 +11,7 @@ class PersistedObserver<Exposed: Sendable, NonOptionalExposed: Sendable, Convert
     typealias Failure = Never
 
     let persistedStorage: Persisted<Exposed, NonOptionalExposed, Convertor>
-    private let currentValueSubject: CurrentValueSubject<Exposed, Never>
+    private let currentValueSubject: PassthroughSubject<Exposed, Never>
 
     init(persistedStorage: Persisted<Exposed, NonOptionalExposed, Convertor>) {
         // We cannot check this condition at compile time. We only publicly expose valid initialisation
@@ -20,7 +20,7 @@ class PersistedObserver<Exposed: Sendable, NonOptionalExposed: Sendable, Convert
             preconditionFailure("Invalid Persisted generic arguments")
         }
         self.persistedStorage = persistedStorage
-        self.currentValueSubject = CurrentValueSubject(persistedStorage.wrappedValue)
+        self.currentValueSubject = PassthroughSubject()
         super.init()
         persistedStorage.storage.addObserver(self, forKeyPath: persistedStorage.key, context: nil)
     }
