@@ -56,6 +56,9 @@ public struct PersistedPublished<Exposed: Sendable, NonOptionalExposed: Sendable
             instance[keyPath: storageKeyPath].persisted.wrappedValue = newValue
         }
     }
+
+    /** The raw `Persisted` that backs this property wrapper. */
+    public var projectedValue: Persisted<Exposed, NonOptionalExposed, Convertor> { persisted }
 }
 
 // MARK: Initialisers
